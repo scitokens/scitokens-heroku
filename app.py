@@ -10,11 +10,17 @@ import base64
 import binascii
 
 
-def bytes_from_long(data):
+def string_from_long(data):
     """
     Create a base64 encoded string for an integer
     """
     return base64.urlsafe_b64encode(cryptography.utils.int_to_bytes(data)).decode('ascii')
+
+def bytes_from_long(data):
+    """
+    Create a base64 encoded bytes for an integer
+    """
+    return base64.urlsafe_b64encode(cryptography.utils.int_to_bytes(data))
 
 @app.route('/')
 def homepage():
@@ -60,8 +66,8 @@ def Certs():
     keys = {'keys': [
         {
             "alg": "RS256",
-            "n": bytes_from_long(numbers.n),
-            "e": bytes_from_long(numbers.e),
+            "n": string_from_long(numbers.n),
+            "e": string_from_long(numbers.e),
             "kty": "RSA",
             "use": "sig",
             "kid": kid
