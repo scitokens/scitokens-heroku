@@ -53,7 +53,7 @@ def Certs():
     
     # Hash the public "n", and use it for the Key ID (kid)
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-    digest.update(bytes_from_long(number.n))
+    digest.update(bytes_from_long(numbers.n))
     kid = binascii.hexlify(digest.finalize())
     
     keys = {'keys': [
