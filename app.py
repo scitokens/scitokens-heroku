@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import json
 from datetime import datetime
 app = Flask(__name__)
@@ -91,6 +91,7 @@ def Issue():
     
     token = scitokens.SciToken(key = private_key)
     token.update_claims({"test": "true"})
+    token.update_claims({"sub": request.remote_addr})
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
     return serialized_token
     
