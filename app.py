@@ -24,6 +24,9 @@ def OpenIDConfiguration():
 # jwks_uri 
 @app.route('/oauth2/certs')
 def Certs():
+    """
+    Provide the "keys"
+    """
     pass
 
 
