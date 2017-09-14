@@ -13,6 +13,7 @@ def homepage():
 # Oauth well known    
 @app.route('/.well-known/openid-configuration')
 def OpenIDConfiguration():
+    # We need more to be compliant with the RFC
     configuration = {
         "issuer": "https://demo.scitokens.org",
         "jwks_uri": "https://demo.scitokens.org/oauth2/certs"
