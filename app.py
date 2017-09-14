@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.backends import default_backend
 import base64
 import binascii
+import scitokens
 
 
 def string_from_long(data):
@@ -75,7 +76,24 @@ def Certs():
     ]}
     return jsonify(keys)
 
-
+@app.route('/issue')
+def Issue():
+    """
+    Issue a SciToken
+    """
+    
+    # Load the private key
+    private_key = serialization.load_pem_private_key(
+        base64.b64decode(os.environ['PRIVATE_KEY']),
+        password=None,
+        backend=default_backend()
+    )
+    
+    token = scitokens.SciToken(key = private_key)
+    token.update_claims({"test": "true"})
+    serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
+    return serialized_token
+    
 
 if __name__ == '__main__':
     # Given the private key in the ENV PRIVATE_KEY, calculate the public key
