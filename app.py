@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import json
 from datetime import datetime
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_url_path='', static_folder='')
 import os
 import cryptography.utils
 from cryptography.hazmat.primitives import serialization, hashes
@@ -25,7 +25,7 @@ def bytes_from_long(data):
 
 @app.route('/')
 def homepage():
-    return app.send_static_file('index.html')
+    return send_from_directory("./", 'index.html')
 
 # Oauth well known    
 @app.route('/.well-known/openid-configuration')
