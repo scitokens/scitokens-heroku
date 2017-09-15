@@ -1,3 +1,3 @@
 Flask
 gunicorn
-scitokens
+scitokens>=0.1.3
