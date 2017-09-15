@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import json
 from datetime import datetime
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 import os
 import cryptography.utils
 from cryptography.hazmat.primitives import serialization, hashes
@@ -25,10 +25,7 @@ def bytes_from_long(data):
 
 @app.route('/')
 def homepage():
-
-    return """
-    <h1>Hello from SciTokens!</h1>
-    """.format()
+    return app.send_static_file('index.html')
 
 # Oauth well known    
 @app.route('/.well-known/openid-configuration')
@@ -98,5 +95,4 @@ def Issue():
 
 if __name__ == '__main__':
     # Given the private key in the ENV PRIVATE_KEY, calculate the public key
-    
     app.run(debug=True, use_reloader=True)

@@ -101,9 +101,6 @@ ENV/
 .mypy_cache/
 bower_components
 node_modules
-css/app.css
-index.html
-vendor
 .tmp
 .DS_Store
 npm-debug.log
