@@ -68,7 +68,7 @@ def Certs():
             "e": string_from_long(numbers.e),
             "kty": "RSA",
             "use": "sig",
-            "kid": kid
+            "kid": kid.decode('utf-8')
         }
     ]}
     return jsonify(keys)
