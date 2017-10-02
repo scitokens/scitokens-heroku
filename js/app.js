@@ -404,46 +404,36 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   function refreshTokenEditor() {
     tokenEditor.off('change', tokenEditorOnChangeListener);
 
-    var algorithm = getAlgorithm();
-    var secretElement = document.getElementsByName('secret')[0];
-    var isBase64EncodedElement = document.getElementsByName('is-base64-encoded')[0];
+    $.ajax({
+        type: "POST",
+        url: "/issue",
+        data: JSON.stringify({ header: headerEditor.getValue(), payload: payloadEditor.getValue()}),
+        contentType: "application/json; charset=utf-8",
+        success: function(data){
+          tokenEditor.setValue(data);
+          
+          $('.input').removeClass('error');
+          $('.jwt-payload').removeClass('error');
+          $('.jwt-header').removeClass('error');
 
-    var signResult = window.sign(
-      algorithm,
-      headerEditor.getValue(),
-      payloadEditor.getValue(),
-      getKey(algorithm, 'sign'),
-      isBase64EncodedElement.checked
-    );
+          saveToStorage(data);
+          tokenEditor.on('change', tokenEditorOnChangeListener);
+          fireEvent(secretElement);
+        },
+        error: function(errMsg) {
+            tokenEditor.setValue('');
+            
+            var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
+            $('.jwt-payload').addClass('error');
+            $('.jwt-header').addClass('error');
+            $('.input').addClass('error');
+            
+            tokenEditor.on('change', tokenEditorOnChangeListener);
+            fireEvent(secretElement);
+        }
+      });
 
-    if (signResult.error) {
-      tokenEditor.setValue('');
-      var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
-      $('.jwt-payload').removeClass('error');
-      $('.jwt-header').removeClass('error');
-      if (signResult.error.who) {
-        signResult.error.who
-          .map(function (e) { return elements[e]; })
-          .forEach(function (e) {
-            $(e).addClass('error');
-          });
-      }
-      $('.input').addClass('error');
-      if (signResult.result) {
-        tokenEditor.setValue(signResult.result);
-      } else {
-        tokenEditor.setValue('');
-      }
-    } else {
-      tokenEditor.setValue(signResult.result);
-      $('.input').removeClass('error');
-      $('.jwt-payload').removeClass('error');
-      $('.jwt-header').removeClass('error');
-
-      saveToStorage(signResult.result);
-    }
-    tokenEditor.on('change', tokenEditorOnChangeListener);
-    fireEvent(secretElement);
+  
   }
 
   function getFirstElementByClassName(selector) {

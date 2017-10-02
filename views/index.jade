@@ -64,18 +64,6 @@ block content
                 option(name='token-type',value='id_token', selected='') id_token
                 option(name='token-type',value='access_token') access_token
 
-          .algorithm
-            span Algorithm
-            .hide
-              label
-                input(type='radio', name='algorithm', value='HS256', checked='')
-              label
-                input(type='radio', name='algorithm', value='RS256')
-            .jwt-select
-              select
-                option(name='algorithm',value='HS256', selected='') HS256
-                option(name='algorithm',value='RS256') RS256
-
         .algorithm-code
           .tab-nav
             .tab-link.current

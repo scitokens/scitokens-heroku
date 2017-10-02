@@ -73,7 +73,7 @@ def Certs():
     ]}
     return jsonify(keys)
 
-@app.route('/issue')
+@app.route('/issue', methods=['GET', 'POST'])
 def Issue():
     """
     Issue a SciToken
@@ -86,9 +86,13 @@ def Issue():
         backend=default_backend()
     )
     
+    data = request.data
+    dataDict = json.loads(data)
     token = scitokens.SciToken(key = private_key)
-    token.update_claims({"test": "true"})
-    token.update_claims({"sub": request.remote_addr})
+    
+    for key, value in json.loads(dataDict['payload']).iteritems():
+        token.update_claims({key: value})
+    
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
     return serialized_token
     
