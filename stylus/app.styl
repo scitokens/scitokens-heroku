@@ -151,12 +151,23 @@ body
     display inline-block
     float left
     padding 20px 0 20px 15px
+    background none
+    font-size 200%
+    color #9B9B9B
+    display block
+    text-decoration none
+    &:hover
+      +breakpoint("tablet")
+        color rgba(white,.8)
+    &.active
+      color white
+    +breakpoint("tablet")
+      display inline-block
     +breakpoint("tablet")
       float none
       position absolute
       left 15px
       top 20px
-      padding 0
     .icon
       display none
       +breakpoint("tablet")
@@ -183,6 +194,7 @@ body
         height 32px
         margin-top 14px
         transform(translateX(-60px))
+
 
   nav.menu
     display none
