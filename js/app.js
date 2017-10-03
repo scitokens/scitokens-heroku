@@ -333,7 +333,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     mode:           'application/json',
     lineWrapping:   true,
     extraKeys: { 'Tab':  tabHack},
-    lint: true
+    lint: true,
+    readOnly: true
   });
 
   var payloadEditor = codeMirror(document.getElementsByClassName('js-payload')[0], {
