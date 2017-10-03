@@ -142,6 +142,7 @@ function autoHeightInput() {
 /*
  * token counter
  */
+/*
 var numberOfLogins = 80482701;
 var pollfreqWhenVisible = 5000;
 var pollfreqWhenHidden = 1000*1000;
@@ -198,7 +199,7 @@ setInterval(function() {
 
 poll();
 
-
+*/
 if (navigator.userAgent.indexOf('Mac OS X') != -1) {
   $("body").addClass("mac");
 } else {
