@@ -269,8 +269,23 @@ $(".panel-default .panel-heading").click(function() {
 
   var DEFAULT_HS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
 
-  var DEFAULT_RS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.EkN-DOsnsuRjRO6BxXemmJDm3HbxrbRzXglbN2S4sOkopdU4IsDxTI8jO19W_A4K8ZPJijNLis4EZsHeY559a4DFOd50_OqgHGuERTqYZyuhtF39yxJPAjUESwxk2J5k_4zM3O-vtd1Ghyo4IbqKKSy6J9mTniYJPenn5-HIirE';
+  var DEFAULT_RS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2RlbW8uc2NpdG9rZW5zLm9yZyIsImlhdCI6MTUwNzA0MDI0NC41NjY0ODksImV4cCI6MTUwNzA0MDg0NC41NjY0ODl9.orvQ2wWTRXEoTb3ysoKc1L924p16dvjIfq2oMV1AXfl1BHQZYvQyZ9Yu46xOpA7t2zpUs9NiPCQV8nsU7k_BTo-UqB0DRemKK3p7-KUkBzgvCzPD7133GFxcPuyI_LmjJSHMEhGj0dcWvy448xB0TUVswMQJT9HncEa0tTdabjGMxkLgr9vAxas7KygpDy-qrvievKghBJg5Yr8bggr3w974_keeED6Zs55jERQUOjPHMFYYl0UvGbnP4WORasX2MMiybku7i8yG9B0Sbdtjp9QJ_Tj9Z_99H_9hTt7b8Gqh4LXnPgl1RSdHqfScHGOSg1QDyk9gqE2RRSveEe24rA'
 
+  //var DEFAULT_RS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.EkN-DOsnsuRjRO6BxXemmJDm3HbxrbRzXglbN2S4sOkopdU4IsDxTI8jO19W_A4K8ZPJijNLis4EZsHeY559a4DFOd50_OqgHGuERTqYZyuhtF39yxJPAjUESwxk2J5k_4zM3O-vtd1Ghyo4IbqKKSy6J9mTniYJPenn5-HIirE';
+
+  var DEFAULT_PUBLIC_RSA = "\
+-----BEGIN PUBLIC KEY-----\n\
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuGDGTLXnqh3mfopjys6s\
+FUBvFl3F4Qt6NEYphq/u/aBhtN1X9NEyb78uB/I1KjciJNGLIQU0ECsJiFx6qV1h\
+R9xE1dPyrS3bU92AVtnBrvzUtTU+aUZAmZQiuAC/rC0+z/TOQr6qJkkUgZtxR9n9\
+op55ZBpRfZD5dzhkW4Dm146vfTKt0D4cIMoMNJS5xQx9nibeB4E8hryZDW/fPeD0\
+XZDcpByNyP0jFDYkxdUtQFvyRpz4WMZ4ejUfvW3gf4LRAfGZJtMnsZ7ZW4RfoQbh\
+iXKMfWeBEjQDiXh0r+KuZLykxhYJtpf7fTnPna753IzMgRMmW3F69iQn2LQN3LoS\
+MwIDAQAB\n\
+-----END PUBLIC KEY-----\
+  "
+
+/*
   var DEFAULT_PUBLIC_RSA = "\
 -----BEGIN PUBLIC KEY-----\n\
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdlatRjRjogo3WojgGHFHYLugd\
@@ -279,6 +294,7 @@ HUfQrSDv+MuSUMAe8jzKE4qW+jK+xQU9a03GUnKHkkle+Q0pX/g6jXZ7r1/xAK5D\
 o2kQ+X5xK9cipRgEKwIDAQAB\n\
 -----END PUBLIC KEY-----\
   ";
+*/
 
   var DEFAULT_PRIVATE_RSA = "\
 -----BEGIN RSA PRIVATE KEY-----\n\
@@ -356,7 +372,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
     var parts = value.split('.');
 
-    var secretElement = document.getElementsByName('secret')[0];
+    //var secretElement = document.getElementsByName('secret')[0];
     var signatureElement = getFirstElementByClassName('js-signature');
 
     if (!signatureElement) {
@@ -365,11 +381,13 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
     var decodedHeader = window.decode(parts[0]);
 
+    /*
     try {
       selectDetectedAlgorithm(JSON.parse(decodedHeader.result).alg);
     }catch (e){
       console.error('Invalid header decoded');
     }
+    */
 
     var selector = $('.jwt-header');
     setJSONEditorContent(headerEditor, decodedHeader, selector);
@@ -377,7 +395,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     selector = $('.jwt-payload');
     setJSONEditorContent(payloadEditor, decodedPayload, selector);
 
-    fireEvent(secretElement);
+    updateSignature();
+    //fireEvent(secretElement);
 
     if (window.matchMedia('(min-width: 768px)').matches) {
       autoHeightInput();
@@ -418,6 +437,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
           saveToStorage(data);
           tokenEditor.on('change', tokenEditorOnChangeListener);
+          updateSignature();
           fireEvent(secretElement);
         },
         error: function(errMsg) {
@@ -429,6 +449,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
             $('.input').addClass('error');
             
             tokenEditor.on('change', tokenEditorOnChangeListener);
+            updateSignature();
             fireEvent(secretElement);
         }
       });
@@ -467,19 +488,21 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       return;
     }
     var value = getTrimmedValue(tokenEditor);
-    var isBase64 = isBase64EncodedElement.checked;
+    //var isBase64 = isBase64EncodedElement.checked;
+    /*
     if (isBase64 && !window.isValidBase64String(secretElement.value)) {
       $(signatureContainerElement).addClass('error');
       return;
     } else {
       $(signatureContainerElement).removeClass('error');
     }
+    */
 
     var result = window.verify(
-      algorithm,
+      "RS256",
       value,
-      getKey(algorithm, 'verify'),
-      isBase64
+      DEFAULT_PUBLIC_RSA,
+      false
     );
 
     var error = result.error;
@@ -508,11 +531,13 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   }
 
   function getAlgorithm() {
-    return algorithmRadios.filter(':checked').val();
+    return 'RS256';
+    //return algorithmRadios.filter(':checked').val();
   }
 
   function updateAlgorithm () {
     var algorithm = algorithmRadios.filter(':checked').val();
+    algorithm = "RS256"
 
     $('.js-input').attr('data-alg', algorithm);
 
@@ -589,18 +614,36 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     updateAlgorithm();
     updateSignature();
   });
+  
+  // When the page first loads, grab a new token from the backend
+  $.ajax({
+      type: "GET",
+      url: "/issue",
+      success: function(data){
+        tokenEditor.setValue(data);
+        
+        $('.input').removeClass('error');
+        $('.jwt-payload').removeClass('error');
+        $('.jwt-header').removeClass('error');
 
-  $('.jwt-signature textarea[name="public-key"]').on('input', updateSignature);
-  $('.jwt-signature textarea[name="private-key"]').on('input', function () {
-    validateKey.apply(this);
-    refreshTokenEditor();
-  });
+        saveToStorage(data);
+        updateSignature();
+        fireEvent(secretElement);
+      },
+      error: function(errMsg) {
+          tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
+          
+          var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
+          $('.jwt-payload').addClass('error');
+          $('.jwt-header').addClass('error');
+          $('.input').addClass('error');
+          
+          fireEvent(secretElement);
+      }
+    });
+  
+  
 
-
-  secretElement.addEventListener('change', updateSignature, false);
-  secretElement.addEventListener('keyup', updateSignature, false);
-
-  isBase64EncodedElement.addEventListener('change', updateSignature, false);
 
   var qs;
   var d;
@@ -709,6 +752,7 @@ $('.stars').each(function(idx, element){
   }
 });
 
+/*
 function setInstalledText() {
   var button = $('#extension-button');
   if(button && button.hasClass('is-installed')) {
@@ -777,6 +821,7 @@ document.getElementById('extension-button').addEventListener('click', function()
     openInWindow();
   }
 });
+*/
 
 //CANVAS
 // $(function(){

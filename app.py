@@ -86,12 +86,14 @@ def Issue():
         backend=default_backend()
     )
     
-    data = request.data
-    dataDict = json.loads(data)
+    
     token = scitokens.SciToken(key = private_key)
     
-    for key, value in json.loads(dataDict['payload']).iteritems():
-        token.update_claims({key: value})
+    if request.method == 'POST':
+        data = request.data
+        dataDict = json.loads(data)
+        for key, value in json.loads(dataDict['payload']).iteritems():
+            token.update_claims({key: value})
     
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
     return serialized_token
