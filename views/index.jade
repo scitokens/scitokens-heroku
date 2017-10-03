@@ -23,11 +23,9 @@ block content
     .container
 
       p
-        | SciTokens are an open,&nbsp;
-        a(href='https://scitokens.org/', target='_blank') evolving standard
-        | &nbsp;based on the industry standard JSON Web Tokens&nbsp;
-        a(href='https://tools.ietf.org/html/rfc7519', target='_blank') RFC 7519
-        |  method for representing claims securely between two parties.
+        | The&nbsp;
+        a(href='https://scitokens.org/', target='_blank') SciTokens
+        | &nbsp;project aims to build a federated ecosystem for authorization on distributed scientific computing infrastructures.
       p demo.scitokens.org allows you to decode, verify and generate SciTokens.
 
       a.btn.btn-lg(href="https://scitokens.org/") Learn more about SciTokens
@@ -44,7 +42,9 @@ block content
   section#debugger-io.debugger-jwt
     .container
       //- a(name='debugger')
-      h1 Debugger
+      h1 Token Generator
+      p Use this token generator to create your own sample SciTokens.  Typically this would be done as part of an OAuth2 workflow.
+      p Edit the payload of the SciToken on the left.  An encoded and signed SciToken will be generated and displayed on the right.  
 
       .jwt-playground
         .selections
@@ -62,16 +62,14 @@ block content
 
         .algorithm-code
           .tab-nav
-            .tab-link.current
-              a(href='#encoded-jwt') Encoded
-                small paste a token here
             .tab-link
               a(href='#decoded-jwt') Decoded
                 small edit the payload
+            .tab-link.current
+              a(href='#encoded-jwt') Encoded
+            
 
           .tab-content
-            #encoded-jwt.box-content.current
-              .input.js-input
             #decoded-jwt.box-content
               .output
                 .jwt-explained.jwt-header
@@ -83,6 +81,8 @@ block content
                   p.text-line PAYLOAD:
                     span DATA
                   .js-payload
+            #encoded-jwt.box-content.current
+              .input.js-input
 
         .validation-status.js-signature
 
