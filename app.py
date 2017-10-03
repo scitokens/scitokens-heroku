@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory
+from flask.ext.api import status
 import json
 from datetime import datetime
 app = Flask(__name__, static_url_path='', static_folder='')
@@ -91,8 +92,13 @@ def Issue():
     
     if request.method == 'POST':
         data = request.data
-        dataDict = json.loads(data)
-        for key, value in json.loads(dataDict['payload']).iteritems():
+        try:
+            dataDict = json.loads(data)
+            payload = json.loads(dataDict['payload'])
+        except json.decoder.JSONDecodeError as json_err:
+            return "", status.HTTP_400_BAD_REQUEST
+        
+        for key, value in payload.items():
             token.update_claims({key: value})
     
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
