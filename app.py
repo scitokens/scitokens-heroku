@@ -9,6 +9,7 @@ from cryptography.hazmat.backends import default_backend
 import base64
 import binascii
 import scitokens
+import scitokens_protect
 
 
 def string_from_long(data):
@@ -102,6 +103,11 @@ def Issue():
     
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
     return serialized_token
+
+@app.route('/protected', methods=['GET'])
+@scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected")
+def Protected():
+    return "Protected resource"
     
 
 if __name__ == '__main__':
