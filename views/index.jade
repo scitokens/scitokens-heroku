@@ -44,6 +44,7 @@ block content
       h1 Token Generator
       p Use this token generator to create your own sample SciTokens.  Typically this would be done as part of an OAuth2 workflow.
       p Edit the payload of the SciToken on the left.  An encoded and signed SciToken will be generated and displayed on the right.  
+      a.btn.btn-lg#protectedPayload(href="javascript:void(0)") Set payload to access to protected area
 
       .jwt-playground
         .selections
@@ -84,6 +85,10 @@ block content
               .input.js-input
 
         .validation-status.js-signature
+        
+
+        p Run the curl command below in order to test access to the SciTokens area
+        .js-curlcommand
 
   section#libraries-io.libraries-jwt
     .container
@@ -104,6 +109,7 @@ block content
         include libraries/scitokens-python.jade
         include libraries/scitokens-java.jade
         
+
 
   section.sources
     .container

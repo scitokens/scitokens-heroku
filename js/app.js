@@ -343,6 +343,14 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     extraKeys: { 'Tab':  tabHack},
     lint: true
   });
+  
+  var curlCommand = codeMirror(document.getElementsByClassName('js-curlcommand')[0], {
+    mode:           'shell',
+    lineWrapping:   true,
+    readOnly: true
+  });
+  
+  
 
   var algorithmRadios = $('input[name="algorithm"]'),
     lastRestoredToken;
@@ -365,7 +373,20 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     jsonEditor.on('change', refreshTokenEditor);
 
   }
+  
+  curlCommand.on('focus', function() {
+    curlCommand.execCommand("selectAll");
+  })
 
+  function updateCurlCommand(serialized_token) {
+    curlCommand.setValue("curl -H \"Authorization: Bearer " + serialized_token + "\" https://demo.scitokens.org/protected")
+  }
+  
+  $("#protectedPayload").on("click", function(e) {
+    
+    payloadEditor.setValue("{\"scope\":\"read:/protected\", \"aud\": \"https://demo.scitokens.org\"}")
+    refreshTokenEditor()
+  })
 
   function tokenEditorOnChangeListener(instance) {
     var value = getTrimmedValue(instance);
@@ -399,6 +420,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
     updateSignature();
     //fireEvent(secretElement);
+    updateCurlCommand(value);
 
     if (window.matchMedia('(min-width: 768px)').matches) {
       autoHeightInput();

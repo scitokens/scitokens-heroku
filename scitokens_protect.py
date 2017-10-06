@@ -70,6 +70,8 @@ def protect(**outer_kwargs):
             validator = scitokens.Validator()
             validator.add_validator('scope', check_scope)
             validator.add_validator('iss', check_iss)
+            
+            # the jwt library already validates the below in the deserialization
             validator.add_validator('iat', return_true)
             validator.add_validator('exp', return_true)
             validator.add_validator('nbf', return_true)
