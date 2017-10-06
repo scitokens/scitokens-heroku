@@ -357,7 +357,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   var tokenRadios = $('input[name="token-type"]');
 
   function setJSONEditorContent(jsonEditor, decodedJSON, selector) {
-    jsonEditor.off('change', refreshTokenEditor);
+    jsonEditor.off('change', lazyRefreshTokenEditor);
 
     if (decodedJSON.result !== null && decodedJSON.result !== undefined) {
       jsonEditor.setValue(decodedJSON.result);
@@ -370,7 +370,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       selector.removeClass('error');
     }
 
-    jsonEditor.on('change', refreshTokenEditor);
+    jsonEditor.on('change', lazyRefreshTokenEditor);
 
   }
   
@@ -496,9 +496,10 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   }
 
   tokenEditor.on('change', tokenEditorOnChangeListener);
+  var lazyRefreshTokenEditor = _.debounce(refreshTokenEditor, 600);
 
-  payloadEditor.on('change',  refreshTokenEditor);
-  headerEditor.on('change',   refreshTokenEditor);
+  payloadEditor.on('change',  lazyRefreshTokenEditor);
+  headerEditor.on('change',   lazyRefreshTokenEditor);
 
   var secretElement = document.getElementsByName('secret')[0];
   var isBase64EncodedElement = document.getElementsByName('is-base64-encoded')[0];
