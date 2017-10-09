@@ -314,6 +314,7 @@ Y0sz/OZtSWcol/UMgQJALesy++GdvoIDLfJX5GBQpuFgFenRiRDabxrE9MNUZ2aP\
 FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   -----END RSA PRIVATE KEY-----\
   ";
+  var updateAll = false;
 
   var codeMirror = CodeMirror;
 
@@ -385,6 +386,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   $("#protectedPayload").on("click", function(e) {
     
     payloadEditor.setValue("{\"scope\":\"read:/protected\", \"aud\": \"https://demo.scitokens.org\"}")
+    updateAll = true;
     refreshTokenEditor()
   })
 
@@ -461,6 +463,10 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
           saveToStorage(data);
           tokenEditor.on('change', tokenEditorOnChangeListener);
+          if (updateAll) {
+            tokenEditorOnChangeListener(tokenEditor);
+            updateAll = false;
+          }
           updateSignature();
           fireEvent(secretElement);
         },
