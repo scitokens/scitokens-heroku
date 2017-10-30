@@ -105,7 +105,7 @@ def Issue():
     return serialized_token
 
 @app.route('/protected', methods=['GET'])
-@scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected")
+@scitokens_protect.protect(audience="https://demo.scitokens.org", scp="read:/protected")
 def Protected():
     return "Protected resource"
     

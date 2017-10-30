@@ -55,7 +55,7 @@ def protect(**outer_kwargs):
                 return ("Unable to deserialize: %{}".format(str(e)), 401, headers)
             
             def check_scope(value):
-                if value == outer_kwargs['scope']:
+                if value == outer_kwargs['scp']:
                     return True
                 else:
                     return False
@@ -68,7 +68,7 @@ def protect(**outer_kwargs):
                 return True
             
             validator = scitokens.Validator()
-            validator.add_validator('scope', check_scope)
+            validator.add_validator('scp', check_scope)
             validator.add_validator('iss', check_iss)
             
             # the jwt library already validates the below in the deserialization
