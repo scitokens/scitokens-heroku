@@ -76,6 +76,7 @@ def protect(**outer_kwargs):
             validator.add_validator('exp', return_true)
             validator.add_validator('nbf', return_true)
             validator.add_validator('aud', return_true)
+            validator.add_validator('jti', return_true)
             
             try:
                 validator.validate(token)
