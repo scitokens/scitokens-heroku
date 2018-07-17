@@ -46,9 +46,14 @@ def Certs():
     Provide the "keys"
     """
     
-    # Read in the private key environment variable
+    if os.path.exists("private.pem"):
+        private_key_str = open("private.pem").read()
+
+    elif 'PRIVATE_KEY' in os.environ:
+        private_key_str = base64.b64decode(os.environ['PRIVATE_KEY'])
+    
     private_key = serialization.load_pem_private_key(
-        base64.b64decode(os.environ['PRIVATE_KEY']),
+        private_key_str,
         password=None,
         backend=default_backend()
     )
@@ -69,9 +74,42 @@ def Certs():
             "e": string_from_long(numbers.e),
             "kty": "RSA",
             "use": "sig",
-            "kid": kid.decode('utf-8')
+            "kid": "key-rs256"
         }
     ]}
+    
+    
+    if os.path.exists("ec_private.pem"):
+        private_key_str = open("ec_private.pem").read()
+
+    elif 'EC_PRIVATE_KEY' in os.environ:
+        private_key_str = base64.b64decode(os.environ['EC_PRIVATE_KEY'])
+
+    private_key = serialization.load_pem_private_key(
+        private_key_str,
+        password=None,
+        backend=default_backend()
+    )
+    
+    # Get the public numbers
+    public_key = private_key.public_key()
+    numbers = public_key.public_numbers()
+    
+    # Hash the public "n", and use it for the Key ID (kid)
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(bytes_from_long(numbers.x))
+    kid = binascii.hexlify(digest.finalize())
+    
+    keys['keys'].append({
+        "alg": "ES256",
+        "x": string_from_long(numbers.x),
+        "y": string_from_long(numbers.y),
+        "kty": "EC",
+        "use": "sig",
+        "kid": "key-es356"
+    })
+    
+    
     return jsonify(keys)
 
 @app.route('/issue', methods=['GET', 'POST'])
@@ -102,6 +140,7 @@ def Issue():
 
         elif 'PRIVATE_KEY' in os.environ:
             private_key_str = base64.b64decode(os.environ['PRIVATE_KEY'])
+        key_id = "key-rs256"
     elif algorithm == "ES256":
         # Load the private key
         if os.path.exists("ec_private.pem"):
@@ -109,14 +148,14 @@ def Issue():
 
         elif 'EC_PRIVATE_KEY' in os.environ:
             private_key_str = base64.b64decode(os.environ['EC_PRIVATE_KEY'])
-
+        key_id = "key-es256"
     private_key = serialization.load_pem_private_key(
         private_key_str,
         password=None,
         backend=default_backend()
     )
 
-    token = scitokens.SciToken(key = private_key, algorithm = algorithm)
+    token = scitokens.SciToken(key = private_key, algorithm = algorithm, key_id=key_id)
     for key, value in payload.items():
         token.update_claims({key: value})
 
