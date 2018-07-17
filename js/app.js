@@ -285,6 +285,12 @@ iXKMfWeBEjQDiXh0r+KuZLykxhYJtpf7fTnPna753IzMgRMmW3F69iQn2LQN3LoS\
 MwIDAQAB\n\
 -----END PUBLIC KEY-----\
   "
+  var DEFAULT_PUBLIC_EC = "\
+-----BEGIN PUBLIC KEY-----\n\
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEncSCrGTBTXXOhNiAOTwNdPjwRz1h\
+VY4saDNiHQK9Bh6wKwVe/HsUACSXCrcLNEIFyCGpk4U8HZ0pRrJLotj8ug==\n\
+-----END PUBLIC KEY-----\
+  "
 
 /*
   var DEFAULT_PUBLIC_RSA = "\
@@ -353,9 +359,13 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   
   
 
-  var algorithmRadios = $('input[name="algorithm"]'),
-    lastRestoredToken;
+  algorithmRadios = $('option[name="algorithm"]');
   var tokenRadios = $('input[name="token-type"]');
+  
+  $('#algorithm-select').change(function() {
+    refreshTokenEditor();
+    
+  });
 
   function setJSONEditorContent(jsonEditor, decodedJSON, selector) {
     jsonEditor.off('change', lazyRefreshTokenEditor);
@@ -433,7 +443,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     var $algRadio = $('.algorithm input[value="'+alg+'"]');
     $algRadio.prop('checked', true);
 
-    fireEvent($algRadio.get(0));
+    //fireEvent($algRadio.get(0));
+    refreshTokenEditor()
   }
 
   function saveToStorage(jwt) {
@@ -452,7 +463,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     $.ajax({
         type: "POST",
         url: "/issue",
-        data: JSON.stringify({ header: headerEditor.getValue(), payload: payloadEditor.getValue()}),
+        data: JSON.stringify({ header: headerEditor.getValue(), payload: payloadEditor.getValue(),
+                               algorithm: $('#algorithm-select option:selected').val()}),
         contentType: "application/json; charset=utf-8",
         success: function(data){
           tokenEditor.setValue(data);
@@ -463,12 +475,14 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
           saveToStorage(data);
           tokenEditor.on('change', tokenEditorOnChangeListener);
+          updateAll = true;
           if (updateAll) {
             tokenEditorOnChangeListener(tokenEditor);
             updateAll = false;
           }
           updateSignature();
-          fireEvent(secretElement);
+          updateCurlCommand(data);
+          //fireEvent(secretElement);
         },
         error: function(errMsg) {
             tokenEditor.setValue('');
@@ -480,7 +494,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
             
             tokenEditor.on('change', tokenEditorOnChangeListener);
             updateSignature();
-            fireEvent(secretElement);
+            //fireEvent(secretElement);
         }
       });
 
@@ -529,12 +543,23 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     }
     */
 
-    var result = window.verify(
-      "RS256",
-      value,
-      DEFAULT_PUBLIC_RSA,
-      false
-    );
+    var result = false;
+    if (algorithm == "RS256") {
+      result = window.verify(
+        "RS256",
+        value,
+        DEFAULT_PUBLIC_RSA,
+        false
+      );
+    } else if (algorithm == "ES256") {
+      result = window.verify(
+        "ES256",
+        value,
+        DEFAULT_PUBLIC_EC,
+        false
+      );
+    }
+    
 
     var error = result.error;
     result = result.result;
@@ -562,13 +587,13 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   }
 
   function getAlgorithm() {
-    return 'RS256';
-    //return algorithmRadios.filter(':checked').val();
+    //return 'RS256';
+    return algorithmRadios.filter(':selected').val();
   }
 
   function updateAlgorithm () {
-    var algorithm = algorithmRadios.filter(':checked').val();
-    algorithm = "RS256"
+    var algorithm = algorithmRadios.filter(':selected').val();
+    //algorithm = "RS256"
 
     $('.js-input').attr('data-alg', algorithm);
 
@@ -637,7 +662,10 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
   algorithmRadios.on('change', function(){
     updateAlgorithm();
+    refreshTokenEditor();
     updateSignature();
+    var value = getTrimmedValue(tokenEditor);
+    updateCurlCommand(value);
   });
 
   tokenRadios.on('change', function(){
@@ -659,7 +687,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
         saveToStorage(data);
         updateSignature();
-        fireEvent(secretElement);
+        //fireEvent(secretElement);
       },
       error: function(errMsg) {
           tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
@@ -669,7 +697,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
           $('.jwt-header').addClass('error');
           $('.input').addClass('error');
           
-          fireEvent(secretElement);
+          //fireEvent(secretElement);
       }
     });
   

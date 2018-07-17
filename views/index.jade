@@ -38,16 +38,33 @@ block content
     ebookSection.style.display = 'block';
     }
 
+
+
   section#debugger-io.debugger-jwt
     .container
+
+
+    
       //- a(name='debugger')
       h1 Token Generator
       p Use this token generator to create your own sample SciTokens.  Typically this would be done as part of an OAuth2 workflow.
-      p Edit the payload of the SciToken on the left.  An encoded and signed SciToken will be generated and displayed on the right.  
+      p Edit the payload of the SciToken on the left.  An encoded and signed SciToken will be generated and displayed on the right.
+      
+
+        
       a.btn.btn-lg#protectedPayload(href="javascript:void(0)") Set payload to access to protected area
+      
+
 
       .jwt-playground
         .selections
+          .select-field.algorithm.h-block
+            span Algorithm
+            .jwt-select.custom-select
+              select#algorithm-select
+                option(name='algorithm',value='RS256',selected='') RS256
+                option(name='algorithm',value='ES256') ES256
+        
           .token-type
             span Token
             .hide
