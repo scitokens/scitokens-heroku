@@ -106,7 +106,7 @@ def Certs():
         "y": string_from_long(numbers.y),
         "kty": "EC",
         "use": "sig",
-        "kid": "key-es356"
+        "kid": "key-es256"
     })
     
     
