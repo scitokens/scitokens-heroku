@@ -159,6 +159,9 @@ def Issue():
     for key, value in payload.items():
         token.update_claims({key: value})
 
+    if 'ver' not in token:
+        token['ver'] = "scitoken:2.0"
+
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
     return serialized_token
 
