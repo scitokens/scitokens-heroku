@@ -395,7 +395,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   
   $("#protectedPayload").on("click", function(e) {
     
-    payloadEditor.setValue("{\"scp\":\"read:/protected\", \"aud\": \"https://demo.scitokens.org\"}")
+    payloadEditor.setValue("{\"scope\":\"read:/protected\", \"aud\": \"https://demo.scitokens.org\"}")
     updateAll = true;
     refreshTokenEditor()
   })
