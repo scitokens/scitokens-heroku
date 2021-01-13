@@ -10,6 +10,7 @@ import base64
 import binascii
 import scitokens
 import scitokens_protect
+import time
 
 
 def string_from_long(data):
@@ -161,8 +162,13 @@ def Issue():
 
     if 'ver' not in token:
         token['ver'] = "scitoken:2.0"
+    
+    # If exp in the token submitted, then honor it by figuring out the lifetime
+    lifetime = 600
+    if 'exp' in token:
+        lifetime = token['exp'] - int(time.time())
 
-    serialized_token = token.serialize(issuer = "https://demo.scitokens.org")
+    serialized_token = token.serialize(issuer = "https://demo.scitokens.org", lifetime = lifetime)
     return serialized_token
 
 @app.route('/protected', methods=['GET'])
