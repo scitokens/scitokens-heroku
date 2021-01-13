@@ -164,8 +164,9 @@ def Issue():
         token['ver'] = "scitoken:2.0"
     
     # If exp in the token submitted, then honor it by figuring out the lifetime
+    # No less than 10 minute lifetimes
     lifetime = 600
-    if 'exp' in token:
+    if 'exp' in token and (token['exp'] - time.time()) > 600:
         lifetime = token['exp'] - int(time.time())
 
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org", lifetime = lifetime)
