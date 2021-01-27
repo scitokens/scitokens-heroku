@@ -169,6 +169,10 @@ def Issue():
     if 'exp' in token and (token['exp'] - time.time()) > 600:
         lifetime = token['exp'] - int(time.time())
 
+    # Add aud if scitoken:2.0
+    if 'ver' in token and token['ver'] == "scitoken:2.0" and 'aud' not in token:
+        token['aud'] = "https://demo.scitokens.org"
+
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org", lifetime = lifetime)
     return serialized_token
 
