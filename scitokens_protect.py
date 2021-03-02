@@ -31,21 +31,7 @@ def protect(**outer_kwargs):
             
             serialized_token = bearer.split()[1]
             try:
-                # Read in the private key environment variable
-                private_key = serialization.load_pem_private_key(
-                    base64.b64decode(os.environ['PRIVATE_KEY']),
-                    password=None,
-                    backend=default_backend()
-                )
-                
-                # Get the public numbers
-                public_key = private_key.public_key()
-                public_pem = public_key.public_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PublicFormat.SubjectPublicKeyInfo
-                )
-                
-                token = scitokens.SciToken.deserialize(serialized_token, audience = outer_kwargs['audience'], public_key = public_pem)
+                token = scitokens.SciToken.deserialize(serialized_token, audience = outer_kwargs['audience'])
             except Exception as e:
                 print(str(e))
                 traceback.print_exc()
@@ -54,38 +40,14 @@ def protect(**outer_kwargs):
                 }
                 return ("Unable to deserialize: %{}".format(str(e)), 401, headers)
             
-            def check_scope(value):
-                if value == outer_kwargs['scope']:
-                    return True
-                else:
-                    return False
-            def check_iss(value):
-                if value == "https://demo.scitokens.org":
-                    return True
-                else:
-                    return False
-            def return_true(value):
-                return True
-            
-            validator = scitokens.Validator()
-            validator.add_validator('scope', check_scope)
-            validator.add_validator('iss', check_iss)
-            
-            # the jwt library already validates the below in the deserialization
-            validator.add_validator('iat', return_true)
-            validator.add_validator('exp', return_true)
-            validator.add_validator('nbf', return_true)
-            validator.add_validator('aud', return_true)
-            validator.add_validator('jti', return_true)
-            
-            try:
-                validator.validate(token)
-            except scitokens.scitokens.ClaimInvalid as ce:
+            enforcer = scitokens.Enforcer()
+            authz, path = outer_kwargs['scope'].split()
+            if not enforcer.test(token, authz, path)
                 headers = {
                     'WWW-Authenticate': 'Bearer'
                 }
                 return ("Validation incorrect", 403, headers)
-            
+
             return some_function(*args, **kwargs)
     
         return wrapper
