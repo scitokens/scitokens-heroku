@@ -42,7 +42,7 @@ def protect(**outer_kwargs):
             
             enforcer = scitokens.Enforcer()
             authz, path = outer_kwargs['scope'].split()
-            if not enforcer.test(token, authz, path)
+            if not enforcer.test(token, authz, path):
                 headers = {
                     'WWW-Authenticate': 'Bearer'
                 }
