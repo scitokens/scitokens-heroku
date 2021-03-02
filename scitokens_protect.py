@@ -40,7 +40,7 @@ def protect(**outer_kwargs):
                 }
                 return ("Unable to deserialize: %{}".format(str(e)), 401, headers)
             
-            enforcer = scitokens.Enforcer()
+            enforcer = scitokens.Enforcer(outer_kwargs['issuer'])
             authz, path = outer_kwargs['scope'].split()
             if not enforcer.test(token, authz, path):
                 headers = {
