@@ -46,7 +46,7 @@ def protect(**outer_kwargs):
                 headers = {
                     'WWW-Authenticate': 'Bearer'
                 }
-                return ("Validation incorrect", 403, headers)
+                return ("Validation incorrect: {}".format(enforcer.last_failure), 403, headers)
 
             return some_function(*args, **kwargs)
     
