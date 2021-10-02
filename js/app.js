@@ -471,6 +471,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       
       tokenEditor.on('change', tokenEditorOnChangeListener);
       updateSignature();
+      return;
     }
 
     $.ajax({
