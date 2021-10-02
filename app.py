@@ -127,12 +127,12 @@ def Issue():
 
     if request.method == 'POST':
         data = request.data
-        print(data)
         try:
             dataDict = json.loads(data)
             payload = json.loads(dataDict['payload'])
             algorithm = json.loads(dataDict['algorithm'])
         except json.decoder.JSONDecodeError as json_err:
+            raise
             return "", 400
 
     private_key_str = ""
