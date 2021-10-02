@@ -129,10 +129,12 @@ def Issue():
         data = request.data
         print(data)
         try:
-            dataDict = json.loads(data)
+            #dataDict = json.loads(data)
             #payload = json.loads(dataDict['payload'])
-            payload = dataDict['payload']
-            algorithm = dataDict['algorithm']
+            payload = request.form.get('payload')
+            print(payload)
+            algorithm = request.form.get('algorithm')
+            print(algorithm)
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
 
