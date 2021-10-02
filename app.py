@@ -129,7 +129,7 @@ def Issue():
         data = request.data
         try:
             dataDict = json.loads(data)
-            payload = json.loads(dataDict['payload'])
+            payload = dataDict['payload']
             algorithm = dataDict['algorithm']
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
