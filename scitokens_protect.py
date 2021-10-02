@@ -50,7 +50,7 @@ def protect(**outer_kwargs):
                 return ("Validation incorrect: {}".format(enforcer.last_failure), 403, headers)
 
             # If the function takes "token" as an argument, send the token
-            if 'token' in inspect.getargspec(some_function).args:
+            if 'token' in inspect.getfullargspec(some_function).args:
                 kwargs['token'] = token
 
             return some_function(*args, **kwargs)
