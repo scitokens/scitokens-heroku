@@ -459,11 +459,24 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
   function refreshTokenEditor() {
     tokenEditor.off('change', tokenEditorOnChangeListener);
+    try {
+      header = JSON.parse(headerEditor.getValue());
+      payload = JSON.parse(payloadEditor.getValue());
+    } catch(e) {
+      tokenEditor.setValue('');     
+      var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
+      $('.jwt-payload').addClass('error');
+      $('.jwt-header').addClass('error');
+      $('.input').addClass('error');
+      
+      tokenEditor.on('change', tokenEditorOnChangeListener);
+      updateSignature();
+    }
 
     $.ajax({
         type: "POST",
         url: "/issue",
-        data: JSON.stringify({ header: headerEditor.getValue(), payload: payloadEditor.getValue(),
+        data: JSON.stringify({ header: header, payload: payload,
                                algorithm: $('#algorithm-select option:selected').val()}),
         contentType: "application/json; charset=utf-8",
         success: function(data){
