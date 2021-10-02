@@ -130,9 +130,8 @@ def Issue():
         try:
             dataDict = json.loads(data)
             payload = json.loads(dataDict['payload'])
-            algorithm = json.loads(dataDict['algorithm'])
+            algorithm = dataDict['algorithm']
         except json.decoder.JSONDecodeError as json_err:
-            raise
             return "", 400
 
     private_key_str = ""
