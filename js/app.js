@@ -463,8 +463,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     $.ajax({
         type: "POST",
         url: "/issue",
-        data: JSON.stringify({ header: headerEditor.getValue(), payload: payloadEditor.getValue(),
-                               algorithm: $('#algorithm-select option:selected').val()}),
+        data: { header: headerEditor.getValue(), payload: payloadEditor.getValue(),
+                               algorithm: $('#algorithm-select option:selected').val()},
         contentType: "application/json; charset=utf-8",
         success: function(data){
           tokenEditor.setValue(data);

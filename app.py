@@ -128,9 +128,10 @@ def Issue():
     if request.method == 'POST':
         data = request.data
         try:
-            dataDict = json.loads(data)
-            payload = json.loads(dataDict['payload'])
-            algorithm = dataDict['algorithm']
+            #dataDict = json.loads(data)
+            #payload = json.loads(dataDict['payload'])
+            payload = data['payload']
+            algorithm = data['algorithm']
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
 
