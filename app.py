@@ -193,7 +193,7 @@ def Secret(token: SciToken):
     """
     if 'sub' in token and "BADGR_TOKEN" in os.environ:
         email = token['sub']
-        headers = {"Authorization": "Bearer iTMDYjoym8T9GSZxCqmkLlWdTJWCWr"}
+        headers = {"Authorization": "Bearer " + os.environ["BADGR_TOKEN"] }
         badge = {
             "badgeclassOpenBadgeId": "https://api.badgr.io/public/badges/0xFqlz4bQ5qAd7FG6FIwEQ",
             "issuer": "oikqaDC8Sx2WPNXUYdh0Dw",
