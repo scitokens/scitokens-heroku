@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import base64
 import os
+import inspect
 
 
 def protect(**outer_kwargs):
@@ -47,6 +48,10 @@ def protect(**outer_kwargs):
                     'WWW-Authenticate': 'Bearer'
                 }
                 return ("Validation incorrect: {}".format(enforcer.last_failure), 403, headers)
+
+            # If the function takes "token" as an argument, send the token
+            if 'token' in inspect.getargspec(some_function).args:
+                kwargs['token'] = token
 
             return some_function(*args, **kwargs)
     

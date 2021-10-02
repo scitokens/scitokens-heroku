@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request, send_from_directory
 import json
 from datetime import datetime
+
+from scitokens.scitokens import SciToken
 app = Flask(__name__, static_url_path='', static_folder='')
 import os
 import cryptography.utils
@@ -11,6 +13,7 @@ import binascii
 import scitokens
 import scitokens_protect
 import time
+import requests
 
 
 def string_from_long(data):
@@ -180,7 +183,43 @@ def Issue():
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer="https://demo.scitokens.org")
 def Protected():
     return "Protected resource"
+
+
+@app.route('/secret', methods=['GET'])
+@scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/secret", issuer="https://demo.scitokens.org")
+def Secret(token: SciToken):
+    """
+    This is the first level of the secret
+    """
+    if 'sub' in token and "BADGR_TOKEN" in os.environ:
+        email = token['sub']
+        headers = {"Authorization": "Bearer iTMDYjoym8T9GSZxCqmkLlWdTJWCWr"}
+        badge = {
+            "badgeclassOpenBadgeId": "https://api.badgr.io/public/badges/0xFqlz4bQ5qAd7FG6FIwEQ",
+            "issuer": "oikqaDC8Sx2WPNXUYdh0Dw",
+            "issuerOpenBadgeId": "https://api.badgr.io/public/issuers/oikqaDC8Sx2WPNXUYdh0Dw",
+            "recipient": {
+                "identity": email,
+                "hashed": False,
+                "type": "email",
+                "salt": ""
+            },
+            "narrative": "Successfully queried the demo token issuer",
+            "evidence": [
+                {
+                "url": "https://demo.scitokens.org",
+                "narrative": "Successfully queried the demo token issuer"
+                }
+            ],
+        }
+        resp = requests.post("https://api.badgr.io/v2/issuers/oikqaDC8Sx2WPNXUYdh0Dw/assertions", json=badge, headers=headers)
+        data = resp.json()
+        returnedText = "Congratulations, you have earned the Demo Application badge: " + data["result"][0]['openBadgeId']
+        return returnedText
+    else:
+        return "Congratulations!  But you didn't include an email in the 'sub' attribute of the token, therefore we cannot issue you a badge"
     
+
 
 if __name__ == '__main__':
     # Given the private key in the ENV PRIVATE_KEY, calculate the public key
