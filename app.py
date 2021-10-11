@@ -182,7 +182,7 @@ def Issue():
 @app.route('/protected', methods=['GET'])
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer="https://demo.scitokens.org")
 def Protected():
-    return "Protected resource"
+    return "Succesfully accessed the protected resource!"
 
 
 @app.route('/secret', methods=['GET'])
