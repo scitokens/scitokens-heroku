@@ -48,7 +48,7 @@ def protect(**outer_kwargs):
                 issuers = outer_kwargs['issuer']
             success = False
             for issuer in issuers:
-                enforcer = scitokens.Enforcer(issuers, audience=outer_kwargs['audience'])
+                enforcer = scitokens.Enforcer(issuer, audience=outer_kwargs['audience'])
                 authz, path = outer_kwargs['scope'].split(":")
 
                 if enforcer.test(token, authz, path):
