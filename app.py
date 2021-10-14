@@ -180,7 +180,7 @@ def Issue():
     return serialized_token
 
 @app.route('/protected', methods=['GET'])
-@scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer="https://demo.scitokens.org")
+@scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer=["https://demo.scitokens.org", "https://cilogon.org"])
 def Protected():
     return "Succesfully accessed the protected resource!"
 

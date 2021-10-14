@@ -40,10 +40,22 @@ def protect(**outer_kwargs):
                     'WWW-Authenticate': 'Bearer'
                 }
                 return ("Unable to deserialize: %{}".format(str(e)), 401, headers)
-            
-            enforcer = scitokens.Enforcer(outer_kwargs['issuer'], audience=outer_kwargs['audience'])
-            authz, path = outer_kwargs['scope'].split(":")
-            if not enforcer.test(token, authz, path):
+
+            issuers = []
+            if not isinstance(outer_kwargs['issuer'], list):
+                issuers = [outer_kwargs['issuer']]
+            else:
+                issuers = outer_kwargs['issuer']
+            success = False
+            for issuer in issuers:
+                enforcer = scitokens.Enforcer(issuers, audience=outer_kwargs['audience'])
+                authz, path = outer_kwargs['scope'].split(":")
+
+                if enforcer.test(token, authz, path):
+                    success = True
+                    break
+
+            if not success:
                 headers = {
                     'WWW-Authenticate': 'Bearer'
                 }
