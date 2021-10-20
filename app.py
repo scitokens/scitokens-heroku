@@ -103,14 +103,16 @@ def issuerToken():
         except Exception as e:
             logging.exception("Failed to deserialize token: " + str(e))
             return e
+        newScope = request.form("scope", refreshTokenObj["orig_scope"])
+        newAud = request.form("audience", refreshTokenObj["orig_aud"])
         accessToken = issueToken({
-            "scope": refreshTokenObj["orig_scope"],
-            "aud": refreshTokenObj["orig_aud"]
+            "scope": newScope,
+            "aud": newAud
         }, "ES256")
         refreshToken = issueToken({
             "scope": "refresh",
-            "orig_scope": refreshTokenObj["orig_scope"],
-            "orig_aud": refreshTokenObj["orig_aud"],
+            "orig_scope": newScope,
+            "orig_aud": newAud,
             "exp": int((datetime.now() + timedelta(days=31)).timestamp())
         }, "ES256")
         return {
