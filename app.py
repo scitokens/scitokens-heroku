@@ -94,10 +94,16 @@ def issuerToken():
         accessToken = issueToken({
             "scope": "read:/protected",
         }, "ES256")
+        refreshExpiration = int((datetime.datetime.now() + datetime.timedelta(days=31)).timestamp())
+        refreshToken = issueToken({
+            "scope": "read:/protected",
+            "exp": refreshExpiration
+        }, "ES256")
         return {
             "access_token": accessToken.decode('utf-8'),
             "expires_in": 20*60,
-            "token_type": "Bearer"
+            "token_type": "Bearer",
+            "refresh_token": refreshToken.decode('utf-8')
         }
     else:
         return {
