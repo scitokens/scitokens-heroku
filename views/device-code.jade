@@ -1,0 +1,49 @@
+extends layout
+
+block content
+  nav.navbar.closed
+    .container
+      .top-mobile
+        .menu-trigger
+          span
+
+        a.brand(href='/').navbar-brand SciTokens
+
+      nav.menu
+        a(href='#debugger-io').scrollto Generator
+        a(href='#libraries-io').scrollto Libraries
+        a(href='https://scitokens.org/') Introduction
+
+      .social
+        a.a0(href='https://www.nsf.gov/', target='_blank')
+          span.by-text Funded by the NSF
+
+  section.banner-jwt
+    .container
+      p Enter the code:
+      form(action="/submit-code")
+        input(type="text", name="code")
+        br
+        button.btn.btn-primary(type="submit") Submit
+
+
+  section.sources
+    .container
+      .columns
+        .column
+          h2 SciTokens Website
+          .text-hold
+            p https://scitokens.org/
+        .column
+          h2 Website Source
+          .text-hold
+            a(href='https://github.com/scitokens/scitokens-heroku', target='_blank')
+              i.icon-1392070209-icon-social-github
+            p https://github.com/scitokens/scitokens-heroku
+        .column
+          h2 Forked From
+          .text-hold
+            a(href='https://github.com/jsonwebtoken/jsonwebtoken.github.io/', target='_blank')
+              i.icon-1392070209-icon-social-github
+            p https://jwt.io/
+

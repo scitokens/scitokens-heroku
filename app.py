@@ -14,6 +14,9 @@ import scitokens
 import scitokens_protect
 import time
 import requests
+import redis
+import uuid
+r = redis.from_url(os.environ.get("REDIS_URL"))
 
 
 def string_from_long(data):
@@ -28,9 +31,78 @@ def bytes_from_long(data):
     """
     return base64.urlsafe_b64encode(cryptography.utils.int_to_bytes(data))
 
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 @app.route('/')
 def homepage():
     return send_from_directory("./", 'index.html')
+
+@app.route('/device-code')
+def deviceCode():
+    return send_from_directory("./device-code/", 'index.html')
+
+@app.route('/submit-code', methods=["POST"])
+def submitCode():
+    deviceCode = r.get(request.form["code"])
+    r.set(deviceCode, "submitted", ex=3600)
+    return 
+
+@app.route("/oauth2/oidc-cm", methods=["POST"])
+def clientRegister():
+    """
+    Register the client.  We don't really need to keep track of clients, so return
+    the same data.
+    """
+    print(request.data)
+    request_data = json.loads(request.data)
+    return {
+        "client_id": "test-client",
+        "grant_types":["refresh_token","urn:ietf:params:oauth:grant-type:device_code"],
+        "scope": request_data['scope']
+    }
+
+@app.route("/oauth2/device_authorization", methods=["POST"])
+def deviceAuth():
+    """
+    Give the user a code and uuid for the device.  This is what the user actually returns.
+    """
+    print(request.data)
+    print(request.form)
+    userCode = id_generator()
+    deviceCode = str(uuid.uuid4())
+    r.set(userCode, deviceCode, ex=5*60)
+    return {
+        "user_code": userCode,
+        "verification_url": "http://localhost:5000/device",
+        "device_code": deviceCode,
+        "expires_in": 3600
+    }
+
+@app.route("/oauth2/token", methods=["POST"])
+def issuerToken():
+    """
+    Check if the issuer has entered the code
+    """
+    print(request.form)
+    deviceCode = request.form["device_code"]
+    
+    if r.get(deviceCode):
+        # Generate the access code and refresh token
+        accessToken = issueToken({
+            "scope": "read:/protected",
+        }, "ES256")
+        return {
+            "access_token": accessToken,
+            "expires_in": 20*60,
+            "token_type": "Bearer"
+        }
+    else:
+        return {
+            "error": "authorization_pending",
+            "error_description": "Still waiting on user"
+        }
+
 
 # Oauth well known    
 @app.route('/.well-known/openid-configuration')
@@ -38,7 +110,44 @@ def OpenIDConfiguration():
     # We need more to be compliant with the RFC
     configuration = {
         "issuer": "https://demo.scitokens.org",
-        "jwks_uri": "https://demo.scitokens.org/oauth2/certs"
+        "jwks_uri": "https://demo.scitokens.org/oauth2/certs",
+        "device_authorization_endpoint": "https://demo.scitokens.org/oauth2/device_authorization",
+        "registration_endpoint": "http://localhost:5000/oauth2/oidc-cm",
+        "token_endpoint": "http://localhost:5000/oauth2/token",
+        "response_types_supported": [
+            "code",
+            "id_token"
+        ],
+        "response_modes_supported": [
+            "query",
+            "fragment",
+            "form_post"
+        ],
+        "grant_types_supported": [
+            "authorization_code",
+            "refresh_token",
+            "urn:ietf:params:oauth:grant-type:token-exchange",
+            "urn:ietf:params:oauth:grant-type:device_code"
+        ],
+        "subject_types_supported": [
+            "public"
+        ],
+        "id_token_signing_alg_values_supported": [
+            "RS256",
+            "RS384",
+            "RS512"
+        ],
+        "scopes_supported": [
+            "read:/",
+            "write:/"
+        ],
+        "claims_supported": [
+            "aud",
+            "exp",
+            "iat",
+            "iss",
+            "sub"
+        ]
     }
     return jsonify(configuration)
     
@@ -133,7 +242,10 @@ def Issue():
             algorithm = dataDict['algorithm']
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
+    
+    return issueToken(payload, algorithm)
 
+def issueToken(payload, algorithm="RS256"):
     private_key_str = ""
 
     if algorithm == "RS256":

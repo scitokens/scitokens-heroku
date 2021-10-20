@@ -35,6 +35,7 @@ module.exports = function (grunt) {
       compile: {
         files: {
           'index.html': 'views/index.jade',
+          'device-code/index.html': 'views/device-code.jade',
           'introduction/index.html': 'views/introduction.jade'
         }
       }
