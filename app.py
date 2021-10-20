@@ -16,6 +16,8 @@ import time
 import requests
 import redis
 import uuid
+import string
+import random
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
 
