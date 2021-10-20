@@ -21,7 +21,7 @@ block content
   section.banner-jwt
     .container
       p Enter the code:
-      form(action="/submit-code")
+      form(action="/submit-code",method="post")
         input(type="text", name="code")
         br
         button.btn.btn-primary(type="submit") Submit

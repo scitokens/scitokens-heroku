@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect, url_for
 import json
 from datetime import datetime
 
@@ -48,7 +48,7 @@ def deviceCode():
 def submitCode():
     deviceCode = r.get(request.form["code"])
     r.set(deviceCode, "submitted", ex=3600)
-    return 
+    return redirect(url_for(''))
 
 @app.route("/oauth2/oidc-cm", methods=["POST"])
 def clientRegister():
@@ -76,7 +76,7 @@ def deviceAuth():
     r.set(userCode, deviceCode, ex=5*60)
     return {
         "user_code": userCode,
-        "verification_url": "https://demo.scitokens.org/device",
+        "verification_url": "https://demo.scitokens.org/device-code",
         "device_code": deviceCode,
         "expires_in": 3600
     }
