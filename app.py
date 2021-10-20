@@ -18,6 +18,8 @@ import redis
 import uuid
 import string
 import random
+import logging
+logging.basicConfig(level=logging.DEBUG)
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
 
@@ -91,12 +93,14 @@ def issuerToken():
     grantType = request.form["grant_type"]
     
     if grantType == "refresh_token":
+        logging.debug("Refresh token detected")
         # Generate the access code and refresh token
         curRefreshToken = request.form["refresh_token"]
         refreshTokenObj = None
         try:
             refreshTokenObj = scitokens.SciToken.deserialize(curRefreshToken, aud="https://demo.scitokens.org")
         except Exception as e:
+            logging.exception("Failed to deserialize token: " + e)
             return e
         accessToken = issueToken({
             "scope": refreshTokenObj["orig_scope"],
@@ -115,6 +119,7 @@ def issuerToken():
             "refresh_token": refreshToken.decode('utf-8')
         }
     elif r.get(deviceCode):
+        logging.debug("Detect device code")
         accessToken = issueToken({
             "scope": "read:/protected",
             "aud": "https://demo.scitokens.org"
