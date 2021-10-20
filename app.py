@@ -99,9 +99,9 @@ def issuerToken():
         curRefreshToken = request.form["refresh_token"]
         refreshTokenObj = None
         try:
-            refreshTokenObj = scitokens.SciToken.deserialize(curRefreshToken, aud="https://demo.scitokens.org")
+            refreshTokenObj = scitokens.SciToken.deserialize(curRefreshToken, audience="https://demo.scitokens.org")
         except Exception as e:
-            logging.exception("Failed to deserialize token: " + e)
+            logging.exception("Failed to deserialize token: " + str(e))
             return e
         accessToken = issueToken({
             "scope": refreshTokenObj["orig_scope"],
