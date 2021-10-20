@@ -90,6 +90,8 @@ def issuerToken():
     """
     print(request.form)
     deviceCode = request.form["device_code"]
+    logging.debug(request.form["grant_type"])
+    print("grant_type = " + request.form["grant_type"])
     grantType = request.form["grant_type"]
     
     if grantType == "refresh_token":
