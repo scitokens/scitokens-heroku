@@ -76,7 +76,7 @@ def deviceAuth():
     r.set(userCode, deviceCode, ex=5*60)
     return {
         "user_code": userCode,
-        "verification_url": "http://localhost:5000/device",
+        "verification_url": "https://demo.scitokens.org/device",
         "device_code": deviceCode,
         "expires_in": 3600
     }
@@ -114,8 +114,8 @@ def OpenIDConfiguration():
         "issuer": "https://demo.scitokens.org",
         "jwks_uri": "https://demo.scitokens.org/oauth2/certs",
         "device_authorization_endpoint": "https://demo.scitokens.org/oauth2/device_authorization",
-        "registration_endpoint": "http://localhost:5000/oauth2/oidc-cm",
-        "token_endpoint": "http://localhost:5000/oauth2/token",
+        "registration_endpoint": "https://demo.scitokens.org/oauth2/oidc-cm",
+        "token_endpoint": "https://demo.scitokens.org/oauth2/token",
         "response_types_supported": [
             "code",
             "id_token"
