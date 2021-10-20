@@ -88,8 +88,9 @@ def issuerToken():
     """
     print(request.form)
     deviceCode = request.form["device_code"]
+    grantType = request.form["grant_type"]
     
-    if r.get(deviceCode):
+    if grantType == "refresh_token" or r.get(deviceCode):
         # Generate the access code and refresh token
         accessToken = issueToken({
             "scope": "read:/protected",
