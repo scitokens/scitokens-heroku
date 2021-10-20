@@ -90,15 +90,40 @@ def issuerToken():
     deviceCode = request.form["device_code"]
     grantType = request.form["grant_type"]
     
-    if grantType == "refresh_token" or r.get(deviceCode):
+    if grantType == "refresh_token":
         # Generate the access code and refresh token
+        curRefreshToken = request.form["refresh_token"]
+        refreshTokenObj = None
+        try:
+            refreshTokenObj = scitokens.SciToken.deserialize(curRefreshToken, aud="https://demo.scitokens.org")
+        except Exception as e:
+            return e
+        accessToken = issueToken({
+            "scope": refreshTokenObj["orig_scope"],
+            "aud": refreshTokenObj["orig_aud"]
+        }, "ES256")
+        refreshToken = issueToken({
+            "scope": "refresh",
+            "orig_scope": refreshTokenObj["orig_scope"],
+            "orig_aud": refreshTokenObj["orig_aud"],
+            "exp": int((datetime.now() + timedelta(days=31)).timestamp())
+        }, "ES256")
+        return {
+            "access_token": accessToken.decode('utf-8'),
+            "expires_in": 20*60,
+            "token_type": "Bearer",
+            "refresh_token": refreshToken.decode('utf-8')
+        }
+    elif r.get(deviceCode):
         accessToken = issueToken({
             "scope": "read:/protected",
+            "aud": "https://demo.scitokens.org"
         }, "ES256")
-        refreshExpiration = int((datetime.now() + timedelta(days=31)).timestamp())
         refreshToken = issueToken({
-            "scope": "read:/protected",
-            "exp": refreshExpiration
+            "scope": "refresh",
+            "orig_scope": "read:/protected",
+            "orig_aud": "https://demo.scitokens.org",
+            "exp": int((datetime.now() + timedelta(days=31)).timestamp())
         }, "ES256")
         return {
             "access_token": accessToken.decode('utf-8'),
