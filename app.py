@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory, redirect, url_for
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from scitokens.scitokens import SciToken
 app = Flask(__name__, static_url_path='', static_folder='')
@@ -94,7 +94,7 @@ def issuerToken():
         accessToken = issueToken({
             "scope": "read:/protected",
         }, "ES256")
-        refreshExpiration = int((datetime.datetime.now() + datetime.timedelta(days=31)).timestamp())
+        refreshExpiration = int((datetime.now() + timedelta(days=31)).timestamp())
         refreshToken = issueToken({
             "scope": "read:/protected",
             "exp": refreshExpiration
