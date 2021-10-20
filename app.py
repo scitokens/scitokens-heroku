@@ -48,7 +48,7 @@ def deviceCode():
 def submitCode():
     deviceCode = r.get(request.form["code"])
     r.set(deviceCode, "submitted", ex=3600)
-    return redirect(url_for(''))
+    return redirect(url_for('homepage'))
 
 @app.route("/oauth2/oidc-cm", methods=["POST"])
 def clientRegister():
@@ -95,7 +95,7 @@ def issuerToken():
             "scope": "read:/protected",
         }, "ES256")
         return {
-            "access_token": accessToken,
+            "access_token": accessToken.decode('utf-8'),
             "expires_in": 20*60,
             "token_type": "Bearer"
         }
