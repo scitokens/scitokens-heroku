@@ -88,13 +88,12 @@ def issuerToken():
     """
     Check if the issuer has entered the code
     """
-    print(request.form)
-    deviceCode = request.form["device_code"]
-    logging.debug(request.form["grant_type"])
-    print("grant_type = " + request.form["grant_type"])
-    grantType = request.form["grant_type"]
+    logging.debug(request.form)
+    deviceCode = request.form.get("device_code", None)
+    grantType = request.form.get("grant_type", None)
+    logging.debug("grant_type = " + grantType)
     
-    if grantType == "refresh_token":
+    if grantType and grantType == "refresh_token":
         logging.debug("Refresh token detected")
         # Generate the access code and refresh token
         curRefreshToken = request.form["refresh_token"]
@@ -120,7 +119,7 @@ def issuerToken():
             "token_type": "Bearer",
             "refresh_token": refreshToken.decode('utf-8')
         }
-    elif r.get(deviceCode):
+    elif deviceCode and r.get(deviceCode):
         logging.debug("Detect device code")
         accessToken = issueToken({
             "scope": "read:/protected",
