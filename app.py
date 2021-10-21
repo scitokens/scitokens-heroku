@@ -105,14 +105,17 @@ def issuerToken():
             return e
         newScope = request.form.get("scope", refreshTokenObj["orig_scope"])
         newAud = request.form.get("audience", refreshTokenObj["orig_aud"])
+        newSub = refreshTokenObj.get("sub", str(uuid.uuid4()))
         accessToken = issueToken({
             "scope": newScope,
-            "aud": newAud
+            "aud": newAud,
+            "sub": newSub
         }, "ES256")
         refreshToken = issueToken({
             "scope": "refresh",
             "orig_scope": newScope,
             "orig_aud": newAud,
+            "sub": newSub,
             "exp": int((datetime.now() + timedelta(days=31)).timestamp())
         }, "ES256")
         return {
@@ -125,12 +128,14 @@ def issuerToken():
         logging.debug("Detect device code")
         accessToken = issueToken({
             "scope": "read:/protected",
-            "aud": "https://demo.scitokens.org"
+            "aud": "https://demo.scitokens.org",
+            "sub": deviceCode
         }, "ES256")
         refreshToken = issueToken({
             "scope": "refresh",
             "orig_scope": "read:/protected",
             "orig_aud": "https://demo.scitokens.org",
+            "sub": deviceCode,
             "exp": int((datetime.now() + timedelta(days=31)).timestamp())
         }, "ES256")
         return {
