@@ -22,6 +22,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
+DATABASE_URL = os.environ['DATABASE_URL']
+db_conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def string_from_long(data):
     """
@@ -350,9 +352,10 @@ def Secret(token: SciToken):
     """
     This is the first level of the secret
     """
-    if 'sub' in token and "BADGR_TOKEN" in os.environ:
+    accessToken = GetAccessToken()
+    if 'sub' in token:
         email = token['sub']
-        headers = {"Authorization": "Bearer " + os.environ["BADGR_TOKEN"] }
+        headers = {"Authorization": "Bearer " + accessToken}
         badge = {
             "badgeclassOpenBadgeId": "https://api.badgr.io/public/badges/0xFqlz4bQ5qAd7FG6FIwEQ",
             "issuer": "oikqaDC8Sx2WPNXUYdh0Dw",
@@ -378,6 +381,26 @@ def Secret(token: SciToken):
     else:
         return "Congratulations!  But you didn't include an email in the 'sub' attribute of the token, therefore we cannot issue you a badge"
     
+@synchronize(key='getaccesstoken', masters={r}, auto_release_time=500, blocking=True)
+def GetAccessToken():
+    # Check if the access token is available
+    accessToken = r.get("BADGR_ACCESS")
+    if accessToken:
+        return accessToken
+    
+    # Check if the refresh token is available
+    refreshToken = r.get("BADGR_REFRESH")
+    responseDict = {}
+
+    if not refreshToken:
+        # Get the refresh token from the environment
+        refreshToken = os.environ["BADGR_REFRESH"]
+    
+    resp = requests.post("https://api.badgr.io/o/token", data={'grant_type':'refresh_token', 'refresh_token':refreshToken})
+    responseDict = resp.json()
+    r.set("BADGR_REFRESH", responseDict["refresh_token"])
+    r.set("BADGR_ACCESS", responseDict["access_token"])
+    return responseDict["access_token"]
 
 
 if __name__ == '__main__':
