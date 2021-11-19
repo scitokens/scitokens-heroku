@@ -22,9 +22,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
-DATABASE_URL = os.environ['DATABASE_URL']
-db_conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-
 def string_from_long(data):
     """
     Create a base64 encoded string for an integer
