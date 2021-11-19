@@ -19,6 +19,7 @@ import uuid
 import string
 import random
 import logging
+from pottery import synchronize
 logging.basicConfig(level=logging.DEBUG)
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
