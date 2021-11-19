@@ -398,7 +398,7 @@ def GetAccessToken():
     responseDict = resp.json()
     r.set("BADGR_REFRESH", responseDict["refresh_token"])
     r.set("BADGR_ACCESS", responseDict["access_token"])
-    return responseDict["access_token"]
+    return responseDict["access_token"].decode("utf-8")
 
 
 if __name__ == '__main__':
