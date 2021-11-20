@@ -384,7 +384,7 @@ def GetAccessToken():
     # Check if the access token is available
     accessToken = r.get("BADGR_ACCESS")
     if accessToken:
-        return accessToken
+        return accessToken.decode("utf-8")
     
     # Check if the refresh token is available
     refreshToken = r.get("BADGR_REFRESH")
@@ -397,7 +397,8 @@ def GetAccessToken():
     resp = requests.post("https://api.badgr.io/o/token", data={'grant_type':'refresh_token', 'refresh_token':refreshToken})
     responseDict = resp.json()
     r.set("BADGR_REFRESH", responseDict["refresh_token"])
-    r.set("BADGR_ACCESS", responseDict["access_token"])
+    # Expire in 8 hours
+    r.set("BADGR_ACCESS", responseDict["access_token"], ex=28800)
     return responseDict["access_token"].decode("utf-8")
 
 
