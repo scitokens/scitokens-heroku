@@ -399,7 +399,7 @@ def GetAccessToken():
     r.set("BADGR_REFRESH", responseDict["refresh_token"])
     # Expire in 8 hours
     r.set("BADGR_ACCESS", responseDict["access_token"], ex=28800)
-    return responseDict["access_token"].decode("utf-8")
+    return responseDict["access_token"]
 
 
 if __name__ == '__main__':
