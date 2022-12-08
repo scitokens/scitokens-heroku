@@ -20,9 +20,15 @@ import string
 import random
 import logging
 from pottery import synchronize
-logging.basicConfig(level=logging.DEBUG)
-r = redis.from_url(os.environ.get("REDIS_URL"))
 
+import jwt#sai
+from jwt import PyJWKClient#sai- need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
+
+
+logging.basicConfig(level=logging.DEBUG)
+#print(os.environ.get("REDIS_URL"))
+#r = redis.from_url(os.environ.get("REDIS_URL")) or "redis://"
+r = "redis://"
 def string_from_long(data):
     """
     Create a base64 encoded string for an integer
@@ -290,7 +296,7 @@ def Issue():
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
     
-    return issueToken(payload, algorithm)
+    return ""##issueToken(payload, algorithm)##sai uncomment
 
 def issueToken(payload, algorithm="RS256"):
     private_key_str = ""
@@ -336,14 +342,55 @@ def issueToken(payload, algorithm="RS256"):
         token['aud'] = "https://demo.scitokens.org"
 
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org", lifetime = lifetime)
-    return serialized_token
+    print(serialized_token)
+    return serialized_token#sai
 
 @app.route('/protected', methods=['GET'])
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer=["https://demo.scitokens.org", "https://cilogon.org"])
 def Protected():
     return "Succesfully accessed the protected resource!"
 
-
+@app.route('/verify',methods=['POST'])
+def Verify():
+    """
+    Verify the SciToken received from the client
+    """
+    if request.method == 'POST':
+        data=request.data
+        dataDict = json.loads(data)
+        print(dataDict['token'])
+        token = dataDict['token']
+        try:
+            
+            deserialized_token = scitokens.SciToken.deserialize(token,audience="https://demo.scitokens.org")#validates the token as well
+            response = {
+                "Success": True,
+                "Error": "Signature Verified"
+            }
+            return(jsonify(response))
+        except Exception as e:
+            print("Failed to deserialize token: " + str(e))
+             # We need more to be compliant with the RFC
+            response = {
+                "Success": False,
+                "Error":  str(e)
+            }
+            return jsonify(response)
+            
+    return jsonify(response)#verifyToken(data,payload, algorithm) #TODO- return JSON with Success:True
+    
+    
+    
+'''    
+def verifyToken(data,payload, algorithm="RS256"):
+    
+    if algorithm == "RS256":
+        
+        return data
+    return data
+ '''   
+ 
+ 
 @app.route('/secret', methods=['GET'])
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/secret", issuer="https://demo.scitokens.org")
 def Secret(token: SciToken):
