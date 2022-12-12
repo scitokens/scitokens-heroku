@@ -566,12 +566,12 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 		newToken = tokenEditor.getValue();
 		
       $.ajax({
-		  type:"POST",
-          url: "verify",
-		  data: JSON.stringify({ token: newToken}),
-          contentType: "application/json; charset=utf-8",
+		type:"POST",
+        url: "verify",
+		data: JSON.stringify({ token: newToken}),
+        contentType: "application/json; charset=utf-8",
           
-		  success: function(data){
+		success: function(data){
           
 			response_msg = data.Error
 			$('.input').removeClass('error');
@@ -584,15 +584,15 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
         },
         error: function(errMsg) {
 			
-        response_msg = data.Error
-        $('.jwt-payload').addClass('error');
-        $('.jwt-header').addClass('error');
-        $('.input').addClass('error');
+			response_msg = data.Error
+			$('.jwt-payload').addClass('error');
+			$('.jwt-header').addClass('error');
+			$('.input').addClass('error');
 		 
-		signatureElement.innerHTML = response_msg;
-		$(signatureElement).removeClass('valid-token');
-		$(signatureElement).addClass('invalid-token');
-		signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
+			signatureElement.innerHTML = response_msg;
+			$(signatureElement).removeClass('valid-token');
+			$(signatureElement).addClass('invalid-token');
+			signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
       }
           
       });//*/
