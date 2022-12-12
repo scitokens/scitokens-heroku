@@ -390,7 +390,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   })
 
   function updateCurlCommand(serialized_token) {
-    curlCommand.setValue("curl -H \"Authorization: Bearer " + serialized_token + "\" https://demo.scitokens.org/protected")//sai
+    curlCommand.setValue("curl -H \"Authorization: Bearer " + serialized_token + "\" https://demo.scitokens.org/protected")
   }
   
   $("#protectedPayload").on("click", function(e) {
@@ -470,7 +470,6 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       $('.input').addClass('error');
       
       tokenEditor.on('change', tokenEditorOnChangeListener);
-	  //tokenEditor.setValue('Blah');//sai remove it
       updateSignature();
       return;
     }
@@ -565,7 +564,6 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     if (algorithm == "RS256") {
 		//Get the pasted token
 		newToken = tokenEditor.getValue();
-		//newToken = "blah";
 		
       $.ajax({
 		  type:"POST",
@@ -574,31 +572,27 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
           contentType: "application/json; charset=utf-8",
           
 		  success: function(data){
-			//TODO- Display returned JSON value -> on the RED/BLUE button
           
-			
 			response_msg = data.Error
-			  $('.input').removeClass('error');
-			  $('.jwt-payload').removeClass('error');
-			  $('.jwt-header').removeClass('error');
-			  $(signatureElement).removeClass('invalid-token');
-			  $(signatureElement).addClass('valid-token');
-			  signatureElement.innerHTML = response_msg;//'<i class="icon-budicon-499"></i> signature verified';
-			//TODO: Should we add the addClass('error') here? Should be done only response message contains error.
+			$('.input').removeClass('error');
+			$('.jwt-payload').removeClass('error');
+			$('.jwt-header').removeClass('error');
+			$(signatureElement).removeClass('invalid-token');
+			$(signatureElement).addClass('valid-token');
+			signatureElement.innerHTML = response_msg;//'<i class="icon-budicon-499"></i> signature verified';
+			
         },
         error: function(errMsg) {
 			
-		  //TODO: Is this correct? Anything to display here?
-          response_msg = data.Error
-          $('.jwt-payload').addClass('error');
-          $('.jwt-header').addClass('error');
-          $('.input').addClass('error');
-		  
-		  signatureElement.innerHTML = response_msg;
-		  
-		  $(signatureElement).removeClass('valid-token');
-		  $(signatureElement).addClass('invalid-token');
-		  signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
+        response_msg = data.Error
+        $('.jwt-payload').addClass('error');
+        $('.jwt-header').addClass('error');
+        $('.input').addClass('error');
+		 
+		signatureElement.innerHTML = response_msg;
+		$(signatureElement).removeClass('valid-token');
+		$(signatureElement).addClass('invalid-token');
+		signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
       }
           
       });//*/

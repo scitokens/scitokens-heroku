@@ -21,14 +21,13 @@ import random
 import logging
 from pottery import synchronize
 
-import jwt#sai
-from jwt import PyJWKClient#sai- need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
+import jwt#add jwt
+from jwt import PyJWKClient#may need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
 
 
 logging.basicConfig(level=logging.DEBUG)
-#print(os.environ.get("REDIS_URL"))
-#r = redis.from_url(os.environ.get("REDIS_URL")) or "redis://"
-r = "redis://"
+r = redis.from_url(os.environ.get("REDIS_URL")) or "redis://"
+#r = "redis://"
 def string_from_long(data):
     """
     Create a base64 encoded string for an integer
@@ -296,7 +295,7 @@ def Issue():
         except json.decoder.JSONDecodeError as json_err:
             return "", 400
     
-    return ""##issueToken(payload, algorithm)##sai uncomment
+    return issueToken(payload, algorithm)
 
 def issueToken(payload, algorithm="RS256"):
     private_key_str = ""
@@ -342,8 +341,7 @@ def issueToken(payload, algorithm="RS256"):
         token['aud'] = "https://demo.scitokens.org"
 
     serialized_token = token.serialize(issuer = "https://demo.scitokens.org", lifetime = lifetime)
-    print(serialized_token)
-    return serialized_token#sai
+    return serialized_token
 
 @app.route('/protected', methods=['GET'])
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/protected", issuer=["https://demo.scitokens.org", "https://cilogon.org"])
@@ -358,7 +356,6 @@ def Verify():
     if request.method == 'POST':
         data=request.data
         dataDict = json.loads(data)
-        print(dataDict['token'])
         token = dataDict['token']
         try:
             
