@@ -21,8 +21,8 @@ import random
 import logging
 from pottery import synchronize
 
-import jwt#add jwt
-from jwt import PyJWKClient#may need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
+#import jwt#add jwt
+#from jwt import PyJWKClient#may need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
 
 
 logging.basicConfig(level=logging.DEBUG)
