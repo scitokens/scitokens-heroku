@@ -5,7 +5,7 @@
     "bower": "^1.4.1",
     "express": "^4.13.4",
     "express-sslify": "^1.0.1",
-    "marked": "^0.3.5",
+    "marked": "^4.0.10",
     "serve": "*",
     "grunt": "^1.5.3",
     "grunt-cli": "^1.2.0",
