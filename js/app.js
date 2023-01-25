@@ -463,7 +463,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       header = JSON.parse(headerEditor.getValue());
       payload = JSON.parse(payloadEditor.getValue());
     } catch(e) {
-      tokenEditor.setValue('');     
+      tokenEditor.setValue(''); 
       var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
       $('.jwt-payload').addClass('error');
       $('.jwt-header').addClass('error');
@@ -538,7 +538,10 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   var secretElement = document.getElementsByName('secret')[0];
   var isBase64EncodedElement = document.getElementsByName('is-base64-encoded')[0];
 
+
   function updateSignature () {
+	
+    
     var algorithm = getAlgorithm();
     var signatureElement = getFirstElementByClassName('js-signature');
     var signatureContainerElement = getFirstElementByClassName('jwt-signature');
@@ -548,23 +551,59 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     }
     var value = getTrimmedValue(tokenEditor);
     //var isBase64 = isBase64EncodedElement.checked;
-    /*
-    if (isBase64 && !window.isValidBase64String(secretElement.value)) {
+    
+    /*if (isBase64 && !window.isValidBase64String(secretElement.value)) {
       $(signatureContainerElement).addClass('error');
       return;
     } else {
       $(signatureContainerElement).removeClass('error');
-    }
-    */
+    }*/
+    
 
     var result = false;
     if (algorithm == "RS256") {
+		//Get the pasted token
+		newToken = tokenEditor.getValue();
+		
+      $.ajax({
+		type:"POST",
+        url: "verify",
+		data: JSON.stringify({ token: newToken}),
+        contentType: "application/json; charset=utf-8",
+          
+		success: function(data){
+          
+			response_msg = data.Error
+			$('.input').removeClass('error');
+			$('.jwt-payload').removeClass('error');
+			$('.jwt-header').removeClass('error');
+			$(signatureElement).removeClass('invalid-token');
+			$(signatureElement).addClass('valid-token');
+			signatureElement.innerHTML = response_msg;//'<i class="icon-budicon-499"></i> signature verified';
+			
+        },
+        error: function(errMsg) {
+			
+			response_msg = data.Error
+			$('.jwt-payload').addClass('error');
+			$('.jwt-header').addClass('error');
+			$('.input').addClass('error');
+		 
+			signatureElement.innerHTML = response_msg;
+			$(signatureElement).removeClass('valid-token');
+			$(signatureElement).addClass('invalid-token');
+			signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
+      }
+          
+      });//*/
+	  /*
+	  //Remove?
       result = window.verify(
         "RS256",
         value,
         DEFAULT_PUBLIC_RSA,
         false
-      );
+      );*/
     } else if (algorithm == "ES256") {
       result = window.verify(
         "ES256",
@@ -572,8 +611,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
         DEFAULT_PUBLIC_EC,
         false
       );
+	  tokenEditor.setValue('ERROR');
     }
-    
 
     var error = result.error;
     result = result.result;
@@ -691,7 +730,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   // When the page first loads, grab a new token from the backend
   $.ajax({
       type: "GET",
-      url: "/issue",
+      url: "issue",
       success: function(data){
         tokenEditor.setValue(data);
         
@@ -701,16 +740,17 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
         saveToStorage(data);
         updateSignature();
+		signatureElement.innerHTML = '<i class="icon-budicon-501"></i> Paste your Token';//TODO- this does not set the defaut status :(
         //fireEvent(secretElement);
       },
       error: function(errMsg) {
           tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
-          
           var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
           $('.jwt-payload').addClass('error');
           $('.jwt-header').addClass('error');
           $('.input').addClass('error');
           
+		  
           //fireEvent(secretElement);
       }
     });
@@ -754,7 +794,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   }
 
   loadFromStorage(function (jwt) {
-    lastRestoredToken = jwt || DEFAULT_HS_TOKEN;
+    lastRestoredToken = jwt ||  DEFAULT_RS_TOKEN|| DEFAULT_HS_TOKEN;
 
     tokenEditor.setValue(
       lastRestoredToken
@@ -824,182 +864,3 @@ $('.stars').each(function(idx, element){
     }
   }
 });
-
-/*
-function setInstalledText() {
-  var button = $('#extension-button');
-  if(button && button.hasClass('is-installed')) {
-    button.find('.button-text').text('Already installed');
-    button.css('cursor', 'default');
-  }
-}
-
-setInstalledText();
-// The is-installed class is added by the extension. It is unspecified when
-// this is done. So check again in a second or so.
-setTimeout(setInstalledText, 1000);
-
-// chrome.webstore.install can only be called from standard event handlers.
-document.getElementById('extension-button').addEventListener('click', function() {
-  var button = $('#extension-button');
-  if(button.hasClass('is-installed')) {
-    return;
-  }
-
-  function isChrome() {
-        // please note,
-        // that IE11 now returns undefined again for window.chrome
-        // and new Opera 30 outputs true for window.chrome
-        // and new IE Edge outputs to true now for window.chrome
-        // and if not iOS Chrome check
-        // so use the below updated condition
-    var isChromium = window.chrome,
-      winNav = window.navigator,
-      vendorName = winNav.vendor,
-      isOpera = winNav.userAgent.indexOf("OPR") > -1,
-      isIEedge = winNav.userAgent.indexOf("Edge") > -1,
-      isIOSChrome = winNav.userAgent.match("CriOS");
-
-    if(isIOSChrome){
-      return false;
-    } else if(isChromium !== null && isChromium !== undefined && vendorName === "Google Inc." && isOpera == false && isIEedge == false) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function openInWindow() {
-    window.open('https://chrome.google.com/webstore/detail/jwt-debugger/ppmmlchacdbknfphdeafcbmklcghghmd');
-  }
-
-  if(isChrome()) {
-    try {
-      chrome.webstore.install('https://chrome.google.com/webstore/detail/ppmmlchacdbknfphdeafcbmklcghghmd', function() {
-        button.addClass('is-installed');
-        setInstalledText();
-      }, function() {
-        button.removeClass('is-installed');
-        button.find('.button-text').text('Add to chrome');
-        openInWindow();
-      });
-    } catch(e) {
-      button.removeClass('is-installed');
-      button.find('.button-text').text('Add to chrome');
-      openInWindow();
-    }
-  } else {
-    button.removeClass('is-installed');
-    button.find('.button-text').text('Add to chrome');
-    openInWindow();
-  }
-});
-*/
-
-//CANVAS
-// $(function(){
-//   var canvas = document.querySelector('canvas'),
-//       ctx = canvas.getContext('2d'),
-//       color = '#000000';
-//   canvas.width = window.innerWidth;
-//   canvas.height = window.innerHeight;
-//   canvas.style.display = 'block';
-//   ctx.fillStyle = color;
-//   ctx.lineWidth = .1;
-//   ctx.strokeStyle = color;
-//
-//   var mousePosition = {
-//     x: 30 * canvas.width / 100,
-//     y: 30 * canvas.height / 100
-//   };
-//
-//   var dots = {
-//     nb: 300,
-//     distance: 100,
-//     d_radius: 150,
-//     array: []
-//   };
-//
-//   function Dot(){
-//     this.x = Math.random() * canvas.width;
-//     this.y = Math.random() * canvas.height;
-//
-//     this.vx = -.5 + Math.random();
-//     this.vy = -.5 + Math.random();
-//
-//     this.radius = Math.random();
-//   }
-//
-//   Dot.prototype = {
-//     create: function(){
-//       ctx.beginPath();
-//       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-//       ctx.fill();
-//     },
-//
-//     animate: function(){
-//       for(i = 0; i < dots.nb; i++){
-//
-//         var dot = dots.array[i];
-//
-//         if(dot.y < 0 || dot.y > canvas.height){
-//           dot.vx = dot.vx;
-//           dot.vy = - dot.vy;
-//         }
-//         else if(dot.x < 0 || dot.x > canvas.width){
-//           dot.vx = - dot.vx;
-//           dot.vy = dot.vy;
-//         }
-//         dot.x += dot.vx;
-//         dot.y += dot.vy;
-//       }
-//     },
-//
-//     line: function(){
-//       for(i = 0; i < dots.nb; i++){
-//         for(j = 0; j < dots.nb; j++){
-//           i_dot = dots.array[i];
-//           j_dot = dots.array[j];
-//
-//           if((i_dot.x - j_dot.x) < dots.distance && (i_dot.y - j_dot.y) < dots.distance && (i_dot.x - j_dot.x) > - dots.distance && (i_dot.y - j_dot.y) > - dots.distance){
-//             if((i_dot.x - mousePosition.x) < dots.d_radius && (i_dot.y - mousePosition.y) < dots.d_radius && (i_dot.x - mousePosition.x) > - dots.d_radius && (i_dot.y - mousePosition.y) > - dots.d_radius){
-//               ctx.beginPath();
-//               ctx.moveTo(i_dot.x, i_dot.y);
-//               ctx.lineTo(j_dot.x, j_dot.y);
-//               ctx.stroke();
-//               ctx.closePath();
-//             }
-//           }
-//         }
-//       }
-//     }
-//   };
-//
-//   function createDots(){
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     for(i = 0; i < dots.nb; i++){
-//       // Prevent memory leak
-//       if (!dots.array[i]) {
-//         dots.array[i] = new Dot();
-//       }
-//       dot = dots.array[i];
-//
-//       dot.create();
-//     }
-//
-//     dot.line();
-//     dot.animate();
-//   }
-//
-//   $('canvas').on('mousemove mouseleave', function(e){
-//     if(e.type == 'mousemove'){
-//       mousePosition.x = e.pageX;
-//       mousePosition.y = e.pageY;
-//     }
-//     if(e.type == 'mouseleave'){
-//       mousePosition.x = canvas.width / 2;
-//       mousePosition.y = canvas.height / 2;
-//     }
-//   });
-//   setInterval(createDots, 1000/30);
-// });

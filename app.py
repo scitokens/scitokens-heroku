@@ -20,9 +20,14 @@ import string
 import random
 import logging
 from pottery import synchronize
-logging.basicConfig(level=logging.DEBUG)
-r = redis.from_url(os.environ.get("REDIS_URL"))
 
+#import jwt#add jwt
+#from jwt import PyJWKClient#may need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
+
+
+logging.basicConfig(level=logging.DEBUG)
+r = redis.from_url(os.environ.get("REDIS_URL")) or "redis://"
+#r = "redis://"
 def string_from_long(data):
     """
     Create a base64 encoded string for an integer
@@ -343,7 +348,46 @@ def issueToken(payload, algorithm="RS256"):
 def Protected():
     return "Succesfully accessed the protected resource!"
 
-
+@app.route('/verify',methods=['POST'])
+def Verify():
+    """
+    Verify the SciToken received from the client
+    """
+    if request.method == 'POST':
+        data=request.data
+        dataDict = json.loads(data)
+        token = dataDict['token']
+        try:
+            
+            deserialized_token = scitokens.SciToken.deserialize(token,audience="https://demo.scitokens.org")#validates the token as well
+            response = {
+                "Success": True,
+                "Error": "Signature Verified"
+            }
+            return(jsonify(response))
+        except Exception as e:
+            print("Failed to deserialize token: " + str(e))
+             # We need more to be compliant with the RFC
+            response = {
+                "Success": False,
+                "Error":  str(e)
+            }
+            return jsonify(response)
+            
+    return jsonify(response)#verifyToken(data,payload, algorithm) #TODO- return JSON with Success:True
+    
+    
+    
+'''    
+def verifyToken(data,payload, algorithm="RS256"):
+    
+    if algorithm == "RS256":
+        
+        return data
+    return data
+ '''   
+ 
+ 
 @app.route('/secret', methods=['GET'])
 @scitokens_protect.protect(audience="https://demo.scitokens.org", scope="read:/secret", issuer="https://demo.scitokens.org")
 def Secret(token: SciToken):
