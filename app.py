@@ -14,20 +14,17 @@ import scitokens
 import scitokens_protect
 import time
 import requests
-import redis
 import uuid
 import string
 import random
 import logging
-from pottery import synchronize
+import boto3
 
 #import jwt#add jwt
 #from jwt import PyJWKClient#may need to run "pip3 install -U pyjwt" because jwt and pyjwt modules conflict
 
 
 logging.basicConfig(level=logging.DEBUG)
-r = redis.from_url(os.environ.get("REDIS_URL")) or "redis://"
-#r = "redis://"
 def string_from_long(data):
     """
     Create a base64 encoded string for an integer
@@ -423,26 +420,45 @@ def Secret(token: SciToken):
     else:
         return "Congratulations!  But you didn't include an email in the 'sub' attribute of the token, therefore we cannot issue you a badge"
     
-@synchronize(key='getaccesstoken', masters={r}, auto_release_time=500, blocking=True)
+
 def GetAccessToken():
     # Check if the access token is available
-    accessToken = r.get("BADGR_ACCESS")
-    if accessToken:
-        return accessToken.decode("utf-8")
-    
-    # Check if the refresh token is available
-    refreshToken = r.get("BADGR_REFRESH")
-    responseDict = {}
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('SciTokens-Demo')
+    response = table.get_item(
+        Key={
+            'keyid': 'badger-access-token'
+        }
+    )
+    if 'Item' in response and response['Item']['storedTime'] < int(time.time()) - 28800:
+        return response['Item']['badgerAccessToken']
 
-    if not refreshToken:
-        # Get the refresh token from the environment
+    response = table.get_item(
+        Key = {
+            'keyid': 'badger-refresh-token'
+        }
+    )
+    if 'Item' in response:
+        refreshToken = response['Item']['badgerRefreshToken']
+    else:
         refreshToken = os.environ["BADGR_REFRESH"]
     
+    responseDict = {}
     resp = requests.post("https://api.badgr.io/o/token", data={'grant_type':'refresh_token', 'refresh_token':refreshToken})
     responseDict = resp.json()
-    r.set("BADGR_REFRESH", responseDict["refresh_token"])
-    # Expire in 8 hours
-    r.set("BADGR_ACCESS", responseDict["access_token"], ex=28800)
+    table.put_item(
+        Item={
+            'keyid': 'badger-access-token',
+            'badgerAccessToken': responseDict["access_token"],
+            'storedTime': int(time.time())
+        }
+    )
+    table.put_item(
+        Item={
+            'keyid': 'badger-refresh-token',
+            'badgerRefreshToken': responseDict["refresh_token"]
+        }
+    )
     return responseDict["access_token"]
 
 
