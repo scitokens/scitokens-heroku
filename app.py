@@ -431,7 +431,7 @@ def GetAccessToken():
         }
     )
     if 'Item' in response and response['Item']['storedTime'] < int(time.time()) - 28800:
-        return response['Item']['badgerAccessToken']
+        return response['Item']['token']
 
     response = table.get_item(
         Key = {
@@ -439,7 +439,7 @@ def GetAccessToken():
         }
     )
     if 'Item' in response:
-        refreshToken = response['Item']['badgerKey']
+        refreshToken = response['Item']['token']
     else:
         refreshToken = os.environ["BADGR_REFRESH"]
     
@@ -449,14 +449,14 @@ def GetAccessToken():
     table.put_item(
         Item={
             'keyid': 'badger-access-token',
-            'badgerAccessToken': responseDict["access_token"],
+            'token': responseDict["access_token"],
             'storedTime': int(time.time())
         }
     )
     table.put_item(
         Item={
             'keyid': 'badger-refresh-token',
-            'badgerRefreshToken': responseDict["refresh_token"]
+            'token': responseDict["refresh_token"]
         }
     )
     return responseDict["access_token"]
