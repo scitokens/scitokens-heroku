@@ -439,7 +439,7 @@ def GetAccessToken():
         }
     )
     if 'Item' in response:
-        refreshToken = response['Item']['badgerRefreshToken']
+        refreshToken = response['Item']['badgerKey']
     else:
         refreshToken = os.environ["BADGR_REFRESH"]
     
