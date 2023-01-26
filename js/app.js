@@ -45,10 +45,10 @@ hljs.configure({
   classPrefix: ''
 });
 
-$('.plain-text pre code').each(function(i, block) {
+$('.plain-text pre code').each(function (i, block) {
   var $snippet = $(this);
 
-  if(!$snippet.hasClass('hljs')) {
+  if (!$snippet.hasClass('hljs')) {
     hljs.highlightBlock(block);
     hljs.lineNumbersBlock(block);
     $snippet.addClass('hljs');
@@ -58,7 +58,7 @@ $('.plain-text pre code').each(function(i, block) {
 /*
  * Show icon
  */
-$(window).scroll(function() {
+$(window).scroll(function () {
   if ($(window).scrollTop() >= 130) {
     $("nav.navbar").addClass("fixed");
   } else {
@@ -83,13 +83,13 @@ function scrollTo($target) {
   }
 }
 
-$('.menu-trigger').on('click', function() {
+$('.menu-trigger').on('click', function () {
   $(this).toggleClass('active');
   $('.navbar').toggleClass('open');
   $('body').toggleClass('menu-mobile');
 });
 
-$('.navbar .menu a').on('click', function() {
+$('.navbar .menu a').on('click', function () {
   $('.menu-trigger').removeClass('active');
   $('.navbar').removeClass('open');
   $('body').removeClass('menu-mobile');
@@ -105,10 +105,10 @@ $('.accordion').accordion({
 /*
  * Scroll to section
  */
-$('a[href^="#"].scrollto').on('click', function(event) {
-  var target = $( $(this).attr('href') );
+$('a[href^="#"].scrollto').on('click', function (event) {
+  var target = $($(this).attr('href'));
 
-  if( target.length ) {
+  if (target.length) {
     event.preventDefault();
     scrollTo(target);
   }
@@ -120,7 +120,7 @@ $(window).on('scroll', function () {
   var sections = $('section');
   var cur_pos = $(window).scrollTop();
 
-  sections.each(function() {
+  sections.each(function () {
     var top = $(this).offset().top - navheight;
     var bottom = top + $(this).outerHeight();
 
@@ -207,7 +207,7 @@ if (navigator.userAgent.indexOf('Mac OS X') != -1) {
 }
 
 
-$(".jwt-playground .tab-link a").click(function() {
+$(".jwt-playground .tab-link a").click(function () {
   var container = $(this).parentsUntil(".jwt-playground").parent();
   if (!$(this).parent().hasClass("current")) {
     container.find(".tab-nav .current").removeClass("current");
@@ -227,11 +227,11 @@ var $grid = $('.libraries-sv').isotope({
   }
 });
 
-$('.filter select').on( 'change', function() {
+$('.filter select').on('change', function () {
   $grid.isotope({ filter: $(this).val() });
 });
 
-$(".panel-default .panel-heading").click(function() {
+$(".panel-default .panel-heading").click(function () {
   if ($(this).hasClass("active")) {
     $(".panel-default .panel-heading").removeClass("active");
     $(".panel-default .panel-wrap").slideUp(300);
@@ -292,16 +292,16 @@ VY4saDNiHQK9Bh6wKwVe/HsUACSXCrcLNEIFyCGpk4U8HZ0pRrJLotj8ug==\n\
 -----END PUBLIC KEY-----\
   "
 
-/*
-  var DEFAULT_PUBLIC_RSA = "\
------BEGIN PUBLIC KEY-----\n\
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdlatRjRjogo3WojgGHFHYLugd\
-UWAY9iR3fy4arWNA1KoS8kVw33cJibXr8bvwUAUparCwlvdbH6dvEOfou0/gCFQs\
-HUfQrSDv+MuSUMAe8jzKE4qW+jK+xQU9a03GUnKHkkle+Q0pX/g6jXZ7r1/xAK5D\
-o2kQ+X5xK9cipRgEKwIDAQAB\n\
------END PUBLIC KEY-----\
-  ";
-*/
+  /*
+    var DEFAULT_PUBLIC_RSA = "\
+  -----BEGIN PUBLIC KEY-----\n\
+  MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdlatRjRjogo3WojgGHFHYLugd\
+  UWAY9iR3fy4arWNA1KoS8kVw33cJibXr8bvwUAUparCwlvdbH6dvEOfou0/gCFQs\
+  HUfQrSDv+MuSUMAe8jzKE4qW+jK+xQU9a03GUnKHkkle+Q0pX/g6jXZ7r1/xAK5D\
+  o2kQ+X5xK9cipRgEKwIDAQAB\n\
+  -----END PUBLIC KEY-----\
+    ";
+  */
 
   var DEFAULT_PRIVATE_RSA = "\
 -----BEGIN RSA PRIVATE KEY-----\n\
@@ -325,46 +325,46 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   var codeMirror = CodeMirror;
 
   function tabHack(instance) {
-    instance.replaceSelection('   ' , 'end');
+    instance.replaceSelection('   ', 'end');
   }
 
   var tokenEditor = codeMirror(document.getElementsByClassName('js-input')[0], {
-    mode:           'jwt',
-    theme:          'night',
-    lineWrapping:   true,
+    mode: 'jwt',
+    theme: 'night',
+    lineWrapping: true,
     // autofocus:      true,
-    extraKeys: { 'Tab':  tabHack}
+    extraKeys: { 'Tab': tabHack }
   });
 
   var headerEditor = codeMirror(document.getElementsByClassName('js-header')[0], {
-    mode:           'application/json',
-    lineWrapping:   true,
-    extraKeys: { 'Tab':  tabHack},
+    mode: 'application/json',
+    lineWrapping: true,
+    extraKeys: { 'Tab': tabHack },
     lint: true,
     readOnly: true
   });
 
   var payloadEditor = codeMirror(document.getElementsByClassName('js-payload')[0], {
-    mode:           'application/json',
-    lineWrapping:   true,
-    extraKeys: { 'Tab':  tabHack},
+    mode: 'application/json',
+    lineWrapping: true,
+    extraKeys: { 'Tab': tabHack },
     lint: true
   });
-  
+
   var curlCommand = codeMirror(document.getElementsByClassName('js-curlcommand')[0], {
-    mode:           'shell',
-    lineWrapping:   true,
+    mode: 'shell',
+    lineWrapping: true,
     readOnly: true
   });
-  
-  
+
+
 
   algorithmRadios = $('option[name="algorithm"]');
   var tokenRadios = $('input[name="token-type"]');
-  
-  $('#algorithm-select').change(function() {
+
+  $('#algorithm-select').change(function () {
     refreshTokenEditor();
-    
+
   });
 
   function setJSONEditorContent(jsonEditor, decodedJSON, selector) {
@@ -384,17 +384,17 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     jsonEditor.on('change', lazyRefreshTokenEditor);
 
   }
-  
-  curlCommand.on('focus', function() {
+
+  curlCommand.on('focus', function () {
     curlCommand.execCommand("selectAll");
   })
 
   function updateCurlCommand(serialized_token) {
     curlCommand.setValue("curl -H \"Authorization: Bearer " + serialized_token + "\" https://demo.scitokens.org/protected")
   }
-  
-  $("#protectedPayload").on("click", function(e) {
-    
+
+  $("#protectedPayload").on("click", function (e) {
+
     payloadEditor.setValue("{\"scope\":\"read:/protected\", \"aud\": \"https://demo.scitokens.org\"}")
     updateAll = true;
     refreshTokenEditor()
@@ -439,8 +439,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     }
   }
 
-  function selectDetectedAlgorithm(alg){
-    var $algRadio = $('.algorithm input[value="'+alg+'"]');
+  function selectDetectedAlgorithm(alg) {
+    var $algRadio = $('.algorithm input[value="' + alg + '"]');
     $algRadio.prop('checked', true);
 
     //fireEvent($algRadio.get(0));
@@ -462,57 +462,59 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     try {
       header = JSON.parse(headerEditor.getValue());
       payload = JSON.parse(payloadEditor.getValue());
-    } catch(e) {
-      tokenEditor.setValue(''); 
-      var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
+    } catch (e) {
+      tokenEditor.setValue('');
+      var elements = { 'payload': '.jwt-payload', 'header': '.jwt-header' };
       $('.jwt-payload').addClass('error');
       $('.jwt-header').addClass('error');
       $('.input').addClass('error');
-      
+
       tokenEditor.on('change', tokenEditorOnChangeListener);
       updateSignature();
       return;
     }
 
     $.ajax({
-        type: "POST",
-        url: "/issue",
-        data: JSON.stringify({ header: header, payload: payload,
-                               algorithm: $('#algorithm-select option:selected').val()}),
-        contentType: "application/json; charset=utf-8",
-        success: function(data){
-          tokenEditor.setValue(data);
-          
-          $('.input').removeClass('error');
-          $('.jwt-payload').removeClass('error');
-          $('.jwt-header').removeClass('error');
+      type: "POST",
+      url: "/issue",
+      data: JSON.stringify({
+        header: header, payload: payload,
+        algorithm: $('#algorithm-select option:selected').val()
+      }),
+      contentType: "application/json; charset=utf-8",
+      success: function (data) {
+        tokenEditor.setValue(data);
 
-          saveToStorage(data);
-          tokenEditor.on('change', tokenEditorOnChangeListener);
-          updateAll = true;
-          if (updateAll) {
-            tokenEditorOnChangeListener(tokenEditor);
-            updateAll = false;
-          }
-          updateSignature();
-          updateCurlCommand(data);
-          //fireEvent(secretElement);
-        },
-        error: function(errMsg) {
-            tokenEditor.setValue('');
-            
-            var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
-            $('.jwt-payload').addClass('error');
-            $('.jwt-header').addClass('error');
-            $('.input').addClass('error');
-            
-            tokenEditor.on('change', tokenEditorOnChangeListener);
-            updateSignature();
-            //fireEvent(secretElement);
+        $('.input').removeClass('error');
+        $('.jwt-payload').removeClass('error');
+        $('.jwt-header').removeClass('error');
+
+        saveToStorage(data);
+        tokenEditor.on('change', tokenEditorOnChangeListener);
+        updateAll = true;
+        if (updateAll) {
+          tokenEditorOnChangeListener(tokenEditor);
+          updateAll = false;
         }
-      });
+        updateSignature();
+        updateCurlCommand(data);
+        //fireEvent(secretElement);
+      },
+      error: function (errMsg) {
+        tokenEditor.setValue('');
 
-  
+        var elements = { 'payload': '.jwt-payload', 'header': '.jwt-header' };
+        $('.jwt-payload').addClass('error');
+        $('.jwt-header').addClass('error');
+        $('.input').addClass('error');
+
+        tokenEditor.on('change', tokenEditorOnChangeListener);
+        updateSignature();
+        //fireEvent(secretElement);
+      }
+    });
+
+
   }
 
   function getFirstElementByClassName(selector) {
@@ -532,16 +534,16 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   tokenEditor.on('change', tokenEditorOnChangeListener);
   var lazyRefreshTokenEditor = _.debounce(refreshTokenEditor, 600);
 
-  payloadEditor.on('change',  lazyRefreshTokenEditor);
-  headerEditor.on('change',   lazyRefreshTokenEditor);
+  payloadEditor.on('change', lazyRefreshTokenEditor);
+  headerEditor.on('change', lazyRefreshTokenEditor);
 
   var secretElement = document.getElementsByName('secret')[0];
   var isBase64EncodedElement = document.getElementsByName('is-base64-encoded')[0];
 
 
-  function updateSignature () {
-	
-    
+  function updateSignature() {
+
+
     var algorithm = getAlgorithm();
     var signatureElement = getFirstElementByClassName('js-signature');
     var signatureContainerElement = getFirstElementByClassName('jwt-signature');
@@ -551,69 +553,84 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     }
     var value = getTrimmedValue(tokenEditor);
     //var isBase64 = isBase64EncodedElement.checked;
-    
+
     /*if (isBase64 && !window.isValidBase64String(secretElement.value)) {
       $(signatureContainerElement).addClass('error');
       return;
     } else {
       $(signatureContainerElement).removeClass('error');
     }*/
-    
+
 
     var result = false;
+    /*
     if (algorithm == "RS256") {
-		//Get the pasted token
-		newToken = tokenEditor.getValue();
-		
-      $.ajax({
-		type:"POST",
-        url: "verify",
-		data: JSON.stringify({ token: newToken}),
-        contentType: "application/json; charset=utf-8",
-          
-		success: function(data){
-          
-			response_msg = data.Error
-			$('.input').removeClass('error');
-			$('.jwt-payload').removeClass('error');
-			$('.jwt-header').removeClass('error');
-			$(signatureElement).removeClass('invalid-token');
-			$(signatureElement).addClass('valid-token');
-			signatureElement.innerHTML = response_msg;//'<i class="icon-budicon-499"></i> signature verified';
-			
-        },
-        error: function(errMsg) {
-			
-			response_msg = data.Error
-			$('.jwt-payload').addClass('error');
-			$('.jwt-header').addClass('error');
-			$('.input').addClass('error');
-		 
-			signatureElement.innerHTML = response_msg;
-			$(signatureElement).removeClass('valid-token');
-			$(signatureElement).addClass('invalid-token');
-			signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
-      }
-          
-      });//*/
-	  /*
-	  //Remove?
+      //Get the pasted token
+      newToken = tokenEditor.getValue();
+
+      //*/
+    /*
+    //Remove?
       result = window.verify(
         "RS256",
         value,
         DEFAULT_PUBLIC_RSA,
         false
-      );*/
-    } else if (algorithm == "ES256") {
-      result = window.verify(
-        "ES256",
-        value,
-        DEFAULT_PUBLIC_EC,
-        false
       );
-	  tokenEditor.setValue('ERROR');
-    }
+  } else if (algorithm == "ES256") {
+    result = window.verify(
+      "ES256",
+      value,
+      DEFAULT_PUBLIC_EC,
+      false
+    );
+    tokenEditor.setValue('ERROR');
+  }
+  */
 
+
+
+    $.ajax({
+      type: "POST",
+      url: "/verify",
+      data: JSON.stringify({ token: value }),
+      contentType: "application/json; charset=utf-8",
+
+      success: function (data) {
+
+        response_msg = data.Error
+        if (data.Success) {
+          $('.input').removeClass('error');
+          $('.jwt-payload').removeClass('error');
+          $('.jwt-header').removeClass('error');
+          $(signatureElement).removeClass('invalid-token');
+          $(signatureElement).addClass('valid-token');
+        } else {
+          $('.jwt-payload').addClass('error');
+          $('.jwt-header').addClass('error');
+          $('.input').addClass('error');
+          $(signatureElement).removeClass('valid-token');
+          $(signatureElement).addClass('invalid-token');
+        }
+        signatureElement.innerHTML = response_msg;//'<i class="icon-budicon-499"></i> signature verified';
+
+      },
+      error: function (data) {
+
+        response_msg = data.Error
+        $('.jwt-payload').addClass('error');
+        $('.jwt-header').addClass('error');
+        $('.input').addClass('error');
+
+        signatureElement.innerHTML = response_msg;
+        $(signatureElement).removeClass('valid-token');
+        $(signatureElement).addClass('invalid-token');
+        signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
+      }
+
+    });
+
+    /*
     var error = result.error;
     result = result.result;
     if (!error && result) {
@@ -625,6 +642,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
       $(signatureElement).addClass('invalid-token');
       signatureElement.innerHTML = '<i class="icon-budicon-501"></i> invalid signature';
     }
+    */
   }
 
   function getKey(algorithm, action) {
@@ -632,7 +650,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     var privateKeyElement = $('textarea[name="private-key"]');
     var publicKeyElement = $('textarea[name="public-key"]');
 
-    if(algorithm === 'HS256') {
+    if (algorithm === 'HS256') {
       return secretElement.val();
     } else {
       return action === 'sign' ? privateKeyElement.val() : publicKeyElement.val();
@@ -644,22 +662,22 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     return algorithmRadios.filter(':selected').val();
   }
 
-  function updateAlgorithm () {
+  function updateAlgorithm() {
     var algorithm = algorithmRadios.filter(':selected').val();
     //algorithm = "RS256"
 
     $('.js-input').attr('data-alg', algorithm);
 
     $('.jwt-signature pre')
-        .hide()
-        .filter('.' + algorithm)
-        .show();
+      .hide()
+      .filter('.' + algorithm)
+      .show();
 
-    if(getTokenType() === 'id_token' && getTrimmedValue(tokenEditor) === DEFAULT_HS_TOKEN &&
-      algorithm === 'RS256'){
+    if (getTokenType() === 'id_token' && getTrimmedValue(tokenEditor) === DEFAULT_HS_TOKEN &&
+      algorithm === 'RS256') {
       setDefaultsForRSA();
-    }else if(getTokenType() === 'id_token' && getTrimmedValue(tokenEditor) === DEFAULT_RS_TOKEN &&
-      algorithm === 'HS256'){
+    } else if (getTokenType() === 'id_token' && getTrimmedValue(tokenEditor) === DEFAULT_RS_TOKEN &&
+      algorithm === 'HS256') {
       setDefaultsForHMAC();
     }
   }
@@ -671,7 +689,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     $('.jwt-signature textarea[name=private-key]').val(DEFAULT_PRIVATE_RSA);
   }
 
-  function setDefaultsForHMAC(){
+  function setDefaultsForHMAC() {
     tokenEditor.setValue(DEFAULT_HS_TOKEN);
   }
 
@@ -698,7 +716,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     var $textarea = $(this);
     var valid;
 
-    if($textarea.prop('name') === 'public-key') {
+    if ($textarea.prop('name') === 'public-key') {
       valid = /-----BEGIN (PUBLIC KEY|CERTIFICATE)-----(.|\n)*-----END (PUBLIC KEY|CERTIFICATE)-----/.test($textarea.val());
     } else {
       valid = /-----BEGIN RSA PRIVATE KEY-----(.|\n)*-----END RSA PRIVATE KEY-----/.test($textarea.val());
@@ -713,7 +731,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
   updateAlgorithm();
 
-  algorithmRadios.on('change', function(){
+  algorithmRadios.on('change', function () {
     updateAlgorithm();
     refreshTokenEditor();
     updateSignature();
@@ -721,41 +739,41 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
     updateCurlCommand(value);
   });
 
-  tokenRadios.on('change', function(){
+  tokenRadios.on('change', function () {
     updateToken();
     updateAlgorithm();
     updateSignature();
   });
-  
+
   // When the page first loads, grab a new token from the backend
   $.ajax({
-      type: "GET",
-      url: "issue",
-      success: function(data){
-        tokenEditor.setValue(data);
-        
-        $('.input').removeClass('error');
-        $('.jwt-payload').removeClass('error');
-        $('.jwt-header').removeClass('error');
+    type: "GET",
+    url: "issue",
+    success: function (data) {
+      tokenEditor.setValue(data);
 
-        saveToStorage(data);
-        updateSignature();
-		signatureElement.innerHTML = '<i class="icon-budicon-501"></i> Paste your Token';//TODO- this does not set the defaut status :(
-        //fireEvent(secretElement);
-      },
-      error: function(errMsg) {
-          tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
-          var elements = {'payload': '.jwt-payload', 'header': '.jwt-header'};
-          $('.jwt-payload').addClass('error');
-          $('.jwt-header').addClass('error');
-          $('.input').addClass('error');
-          
-		  
-          //fireEvent(secretElement);
-      }
-    });
-  
-  
+      $('.input').removeClass('error');
+      $('.jwt-payload').removeClass('error');
+      $('.jwt-header').removeClass('error');
+
+      saveToStorage(data);
+      updateSignature();
+      signatureElement.innerHTML = '<i class="icon-budicon-501"></i> Paste your Token';//TODO- this does not set the defaut status :(
+      //fireEvent(secretElement);
+    },
+    error: function (errMsg) {
+      tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
+      var elements = { 'payload': '.jwt-payload', 'header': '.jwt-header' };
+      $('.jwt-payload').addClass('error');
+      $('.jwt-header').addClass('error');
+      $('.input').addClass('error');
+
+
+      //fireEvent(secretElement);
+    }
+  });
+
+
 
 
   var qs;
@@ -794,7 +812,7 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
   }
 
   loadFromStorage(function (jwt) {
-    lastRestoredToken = jwt ||  DEFAULT_RS_TOKEN|| DEFAULT_HS_TOKEN;
+    lastRestoredToken = jwt || DEFAULT_RS_TOKEN || DEFAULT_HS_TOKEN;
 
     tokenEditor.setValue(
       lastRestoredToken
@@ -805,8 +823,8 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 
 
 //TIMESTAMP
-(function() {
-  setInterval(function() {
+(function () {
+  setInterval(function () {
     var now, timestamp;
     timestamp = new Date(1987, 5, 30);
     now = new Date();
@@ -818,25 +836,25 @@ FaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==\n\
 $('[data-toggle="tooltip"]').tooltip();
 
 // 07012015
-$(".debugger-jwt .algorithm select").change(function() {
-  $('.debugger-jwt .algorithm input[value="'+$(this).val()+'"]').parent().trigger("click");
-  $('.debugger-jwt .algorithm input[value="'+$(this).val()+'"]').change();
+$(".debugger-jwt .algorithm select").change(function () {
+  $('.debugger-jwt .algorithm input[value="' + $(this).val() + '"]').parent().trigger("click");
+  $('.debugger-jwt .algorithm input[value="' + $(this).val() + '"]').change();
 });
 
 
-$(".debugger-jwt .algorithm select").change(function(){var a=$('.debugger-jwt .algorithm input[value="'+$(this).val()+'"]');a.prop("checked",!0);});
+$(".debugger-jwt .algorithm select").change(function () { var a = $('.debugger-jwt .algorithm input[value="' + $(this).val() + '"]'); a.prop("checked", !0); });
 // end 07012015
 
-$(".debugger-jwt .token-type select").change(function() {
-  $('.debugger-jwt .token-type input[value="'+$(this).val()+'"]').parent().trigger("click");
-  $('.debugger-jwt .token-type input[value="'+$(this).val()+'"]').change();
+$(".debugger-jwt .token-type select").change(function () {
+  $('.debugger-jwt .token-type input[value="' + $(this).val() + '"]').parent().trigger("click");
+  $('.debugger-jwt .token-type input[value="' + $(this).val() + '"]').change();
 });
 
-$(".debugger-jwt .token-type select").change(function(){var a=$('.debugger-jwt .token-type input[value="'+$(this).val()+'"]');a.prop("checked",!0);});
+$(".debugger-jwt .token-type select").change(function () { var a = $('.debugger-jwt .token-type input[value="' + $(this).val() + '"]'); a.prop("checked", !0); });
 
 
 // Fetch stargazers count for each repo from GitHub's API
-$('.stars').each(function(idx, element){
+$('.stars').each(function (idx, element) {
   var $el = $(element);
   var repo = $el.attr('data-repo');
 
@@ -850,11 +868,11 @@ $('.stars').each(function(idx, element){
     $el.show();
   }
 
-  if (repo){
+  if (repo) {
     var repoKey = "stars_" + repo;
-    if(!localStorage.getItem(repoKey)) {
+    if (!localStorage.getItem(repoKey)) {
 
-      $.getJSON('https://api.github.com/repos/' + repo, function(repoData){
+      $.getJSON('https://api.github.com/repos/' + repo, function (repoData) {
         var starCount = repoData.stargazers_count;
         safeLocalStorageSetItem(repoKey, starCount);
         setCount(starCount);
