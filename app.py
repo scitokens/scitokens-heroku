@@ -430,7 +430,7 @@ def GetAccessToken():
             'keyid': 'badger-access-token'
         }
     )
-    if 'Item' in response and response['Item']['storedTime'] < int(time.time()) - 28800:
+    if 'Item' in response and response['Item']['storedTime'] > int(time.time()) - 28800:
         return response['Item']['token']
 
     response = table.get_item(
