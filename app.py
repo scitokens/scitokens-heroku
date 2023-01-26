@@ -456,7 +456,8 @@ def GetAccessToken():
     table.put_item(
         Item={
             'keyid': 'badger-refresh-token',
-            'token': responseDict["refresh_token"]
+            'token': responseDict["refresh_token"],
+            'storedTime': int(time.time())
         }
     )
     return responseDict["access_token"]
