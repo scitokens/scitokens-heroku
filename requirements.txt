@@ -1,7 +1,0 @@
-Flask
-gunicorn
-scitokens>=1.6.0
-requests
-redis
-pottery
-boto3

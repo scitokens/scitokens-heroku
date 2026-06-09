@@ -1,0 +1,9 @@
+# Copy to `.dev.vars` for local `pywrangler dev`. Never commit the real file.
+# Values are base64-encoded PEM private keys (same convention as the old app):
+#   PRIVATE_KEY=$(base64 -i private.pem)
+#   EC_PRIVATE_KEY=$(base64 -i ec_private.pem)
+PRIVATE_KEY="base64-encoded-RSA-PEM-here"
+EC_PRIVATE_KEY="base64-encoded-EC-PEM-here"
+
+# Only needed for the /secret (Badgr badge) endpoint:
+BADGR_REFRESH="badgr-refresh-token-here"
