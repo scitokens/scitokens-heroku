@@ -91,6 +91,31 @@ uv run pywrangler deploy
 > (use `npm run watch:css` while developing). Tailwind only emits classes it finds while
 > scanning `public/**/*.html`, including those built dynamically in the inline `<script>`.
 
+## Continuous deployment (GitHub Actions)
+
+Two workflows live in `.github/workflows/`:
+
+- **`ci.yml`** (on every PR + push to `master`): `npm ci`, builds the CSS, fails if
+  `public/app.css` is stale, then runs `pywrangler deploy --dry-run` to confirm the Worker
+  bundles. Needs no Cloudflare credentials.
+- **`deploy.yml`** (on push to `master` + manual `workflow_dispatch`): builds the CSS and
+  runs `uv run pywrangler deploy`. Merging a PR to `master` ships it.
+
+**One-time setup before the first deploy works:**
+
+1. **Create a Cloudflare API token** (My Profile → API Tokens → *Edit Cloudflare Workers*
+   template, scoped to this account/zone) and add it as a repo secret
+   **`CLOUDFLARE_API_TOKEN`**. Optionally add **`CLOUDFLARE_ACCOUNT_ID`** (only needed if the
+   token can see more than one account). Settings → Secrets and variables → Actions.
+   `deploy.yml` uses a `production` GitHub Environment — either create that environment
+   (and put the secrets there, where you can also require reviewers) or remove the
+   `environment: production` line.
+2. **Replace `REPLACE_WITH_KV_NAMESPACE_ID`** in `wrangler.jsonc` with the id printed by
+   `npx wrangler kv namespace create BADGR_CACHE` — a real deploy fails with a placeholder id.
+3. **Set the Worker secrets once** (they persist in Cloudflare, so the Action doesn't carry
+   them): `PRIVATE_KEY`, `EC_PRIVATE_KEY`, and `BADGR_REFRESH` via `npx wrangler secret put …`
+   (see [Configuration](#configuration)).
+
 ## Local frontend dev (no Cloudflare toolchain)
 
 `dev_server.py` reuses the exact `src/tokens.py` logic and the local `*.pem` files, so
