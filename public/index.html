@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SciTokens Demo — Decode, Verify &amp; Generate SciTokens</title>
+  <meta name="description" content="The SciTokens project aims to build a federated ecosystem for authorization on distributed scientific computing infrastructures. demo.scitokens.org lets you decode, verify and generate SciTokens." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png" />
+
+  <!-- Apply the saved/system theme before first paint to avoid a flash -->
+  <script>
+    (function () {
+      var stored = localStorage.getItem('theme');
+      var dark = stored ? stored === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+    })();
+  </script>
+
+  <!-- Styling: precompiled Tailwind (see styles/input.css + `npm run build:css`) -->
+  <link rel="stylesheet" href="/app.css" />
+  <!-- CodeMirror 5 (CDN, JSON syntax highlighting) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+</head>
+<body class="text-slate-800 antialiased dark:text-slate-200">
+
+  <!-- Nav -->
+  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-[#0c0f17]/80">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+      <a href="/" class="flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+        <span class="inline-block h-3 w-3 rounded-full bg-[#fb015b]"></span>
+        SciTokens
+      </a>
+      <div class="flex items-center gap-4 text-sm sm:gap-6">
+        <a href="#debugger" class="hidden sm:inline text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Generator</a>
+        <a href="#libraries" class="hidden sm:inline text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Libraries</a>
+        <a href="https://scitokens.org/" class="hidden sm:inline text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Introduction</a>
+        <a href="https://www.nsf.gov/" target="_blank" rel="noopener" class="hidden md:inline text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">Funded by the NSF</a>
+        <button id="theme-toggle" type="button" aria-label="Toggle dark mode"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+          <!-- Sun (shown in dark mode → click for light) -->
+          <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <!-- Moon (shown in light mode → click for dark) -->
+          <svg class="block h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <!-- Hamburger (mobile only) -->
+        <button id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 sm:hidden dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+          <svg id="nav-icon-open" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+          <svg id="nav-icon-close" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6l-12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+    <!-- Mobile menu panel -->
+    <div id="mobile-menu" class="hidden border-t border-slate-200 sm:hidden dark:border-white/10">
+      <div class="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-3 text-sm">
+        <a href="#debugger" class="rounded-md px-2 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">Generator</a>
+        <a href="#libraries" class="rounded-md px-2 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">Libraries</a>
+        <a href="https://scitokens.org/" class="rounded-md px-2 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">Introduction</a>
+        <a href="https://www.nsf.gov/" target="_blank" rel="noopener" class="rounded-md px-2 py-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white">Funded by the NSF</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-6xl px-5 pt-12 pb-6">
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+      SciTokens <span class="text-[#fb015b]">Debugger</span>
+    </h1>
+    <p class="mt-3 max-w-3xl text-slate-600 dark:text-slate-300">
+      The <a class="text-[#fb015b] hover:underline" href="https://scitokens.org/" target="_blank" rel="noopener">SciTokens</a>
+      project builds a federated ecosystem for authorization on distributed scientific computing infrastructures.
+      <span class="text-slate-500 dark:text-slate-400">demo.scitokens.org</span> lets you decode, verify and generate SciTokens.
+    </p>
+    <a href="https://scitokens.org/" class="mt-5 inline-block rounded-md bg-[#fb015b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d80f56]">
+      Learn more about SciTokens
+    </a>
+  </section>
+
+  <!-- Debugger -->
+  <main id="debugger" class="mx-auto max-w-6xl px-5 pb-16">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-white/10 dark:bg-[#11151f] dark:shadow-2xl">
+      <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white">Token Generator</h2>
+          <p class="mt-1 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+            Edit the payload on the right. An encoded and signed SciToken is generated on the left.
+          </p>
+        </div>
+        <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          Algorithm
+          <select id="algorithm-select" class="mt-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-normal normal-case text-slate-800 focus:border-[#fb015b] focus:outline-none dark:border-white/10 dark:bg-[#0f1320] dark:text-slate-100">
+            <option value="RS256" selected>RS256</option>
+            <option value="ES256">ES256</option>
+          </select>
+        </label>
+      </div>
+
+      <button id="protectedPayload" class="mb-4 rounded-md border border-[#fb015b]/40 bg-[#fb015b]/10 px-3 py-1.5 text-sm text-[#c40b51] hover:bg-[#fb015b]/20 dark:text-[#ff7eb0]">
+        Set payload to access the protected area
+      </button>
+
+      <div class="grid gap-5 lg:grid-cols-2">
+        <!-- Encoded (spans the full height of the stacked header + payload column) -->
+        <div id="panel-encoded" class="min-w-0 lg:flex lg:flex-col">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Encoded <span class="font-normal normal-case text-slate-400 dark:text-slate-500">paste a token here</span></h3>
+            <button type="button" class="copy-editor shrink-0 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" data-editor="token" aria-label="Copy encoded token">Copy</button>
+          </div>
+          <div class="overflow-hidden rounded-lg border border-slate-200 lg:flex-1 dark:border-white/10"><textarea id="token"></textarea></div>
+        </div>
+
+        <!-- Decoded -->
+        <div class="min-w-0 space-y-4">
+          <div id="panel-header">
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-widest text-[#fb015b]">Header <span class="font-normal normal-case text-slate-400 dark:text-slate-500">algorithm &amp; token type</span></h3>
+              <button type="button" class="copy-editor shrink-0 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" data-editor="header" aria-label="Copy header JSON">Copy</button>
+            </div>
+            <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-white/10"><textarea id="header"></textarea></div>
+          </div>
+          <div id="panel-payload">
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-widest text-[#b21fe0] dark:text-[#d63aff]">Payload <span class="font-normal normal-case text-slate-400 dark:text-slate-500">data — editable</span></h3>
+              <button type="button" class="copy-editor shrink-0 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" data-editor="payload" aria-label="Copy payload JSON">Copy</button>
+            </div>
+            <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-white/10"><textarea id="payload"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature status -->
+      <div id="signature" class="mt-5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600 dark:border-white/10 dark:bg-[#0f1320] dark:text-slate-300">
+        Loading…
+      </div>
+
+      <!-- Claim-level validation -->
+      <div id="claims" class="mt-3 hidden rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-[#0f1320]">
+        <h3 class="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Claims</h3>
+        <div id="claims-validity" class="space-y-1.5 text-sm"></div>
+        <dl id="claims-list" class="mt-3 grid grid-cols-1 gap-x-6 gap-y-1.5 border-t border-slate-200 pt-3 text-sm sm:grid-cols-2 dark:border-white/10"></dl>
+      </div>
+
+      <!-- curl -->
+      <div class="mt-5">
+        <p class="mb-2 text-sm text-slate-500 dark:text-slate-400">Run the curl command below to test access to the protected SciTokens area:</p>
+        <div class="install-cmd relative">
+          <pre id="curl" class="whitespace-pre-wrap break-all rounded-lg border border-slate-200 bg-slate-50 p-3 pr-16 text-xs text-cyan-700 dark:border-white/10 dark:bg-[#0f1320] dark:text-[#00b9f1]"></pre>
+          <button type="button" class="copy-btn absolute right-2 top-2 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" aria-label="Copy command">Copy</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Libraries -->
+  <section id="libraries" class="mx-auto max-w-6xl px-5 pb-20">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Libraries for Token Signing / Verification</h2>
+      <label class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        Filter by
+        <select id="lib-filter" class="rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-800 focus:border-[#fb015b] focus:outline-none dark:border-white/10 dark:bg-[#0f1320] dark:text-slate-100">
+          <option value="*" selected>All</option>
+          <option value="java">Java</option>
+          <option value="python">Python</option>
+          <option value="cpp">C++</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="lib-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <article data-lang="python" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#11151f]">
+        <div class="flex items-center gap-3">
+          <img src="/img/4.svg" alt="" class="h-9 w-9" />
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Python</h3>
+        </div>
+        <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Maintained by the <a class="text-[#fb015b] hover:underline" href="https://github.com/scitokens">SciTokens Team</a></p>
+        <a class="mt-2 inline-block text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="https://github.com/scitokens/scitokens" target="_blank" rel="noopener">View Repo →</a>
+        <div class="install-cmd relative mt-4">
+          <pre class="overflow-x-auto rounded-md bg-slate-50 p-3 pr-12 text-xs text-cyan-700 dark:bg-[#0f1320] dark:text-[#00b9f1]"><code>pip install scitokens</code></pre>
+          <button type="button" class="copy-btn absolute right-2 top-2 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" aria-label="Copy command">Copy</button>
+        </div>
+      </article>
+
+      <article data-lang="java" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#11151f]">
+        <div class="flex items-center gap-3">
+          <img src="/img/3.svg" alt="" class="h-9 w-9" />
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Java</h3>
+        </div>
+        <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Maintained by the <a class="text-[#fb015b] hover:underline" href="https://github.com/scitokens">SciTokens Team</a></p>
+        <a class="mt-2 inline-block text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="https://github.com/scitokens/scitokens-java" target="_blank" rel="noopener">View Repo →</a>
+        <div class="install-cmd relative mt-4">
+          <pre class="overflow-x-auto rounded-md bg-slate-50 p-3 pr-12 text-xs text-cyan-700 dark:bg-[#0f1320] dark:text-[#00b9f1]"><code>maven: com.auth0 / java-jwt / 3.0.1</code></pre>
+          <button type="button" class="copy-btn absolute right-2 top-2 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" aria-label="Copy command">Copy</button>
+        </div>
+      </article>
+
+      <article data-lang="cpp" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#11151f]">
+        <div class="flex items-center gap-3">
+          <img src="/img/26.svg" alt="" class="h-9 w-9" />
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">C++</h3>
+        </div>
+        <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Maintained by the <a class="text-[#fb015b] hover:underline" href="https://github.com/scitokens">SciTokens Team</a></p>
+        <a class="mt-2 inline-block text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="https://github.com/scitokens/scitokens-cpp" target="_blank" rel="noopener">View Repo →</a>
+        <div class="install-cmd relative mt-4">
+          <pre class="overflow-x-auto rounded-md bg-slate-50 p-3 pr-12 text-xs text-cyan-700 dark:bg-[#0f1320] dark:text-[#00b9f1]"><code>git clone https://github.com/scitokens/scitokens-cpp.git</code></pre>
+          <button type="button" class="copy-btn absolute right-2 top-2 rounded border border-slate-200 bg-white/80 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white" aria-label="Copy command">Copy</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Footer / sources -->
+  <footer class="border-t border-slate-200 dark:border-white/10">
+    <div class="mx-auto grid max-w-6xl gap-8 px-5 py-10 text-sm sm:grid-cols-3">
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white">SciTokens Website</h4>
+        <a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="https://scitokens.org/">https://scitokens.org/</a>
+      </div>
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white">Website Source</h4>
+        <a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="https://github.com/scitokens/scitokens-heroku" target="_blank" rel="noopener">github.com/scitokens/scitokens-heroku</a>
+      </div>
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white">Inspired By</h4>
+        <a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="https://jwt.io/" target="_blank" rel="noopener">https://jwt.io/</a>
+      </div>
+    </div>
+    <p class="mx-auto max-w-6xl px-5 pb-10 text-xs text-slate-400 dark:text-slate-500">
+      This material is based upon work supported by the National Science Foundation under Grant No. 1738962.
+      Any opinions, findings, and conclusions or recommendations expressed in this material are those of the
+      author(s) and do not necessarily reflect the views of the National Science Foundation.
+    </p>
+  </footer>
+
+  <script>
+    // --- CodeMirror "jwt" mode: colour the three dot-separated segments ------
+    CodeMirror.defineMode('jwt', function () {
+      function header(stream, state) { stream.eatWhile(/[^.]/); state.cur = dot1; return 'jwt-header'; }
+      function dot1(stream, state) { stream.next(); state.cur = payload; return 'jwt-dot'; }
+      function payload(stream, state) { stream.eatWhile(/[^.]/); state.cur = dot2; return 'jwt-payload'; }
+      function dot2(stream, state) { stream.next(); state.cur = signature; return 'jwt-dot'; }
+      function signature(stream) { stream.skipToEnd(); return 'jwt-signature'; }
+      return {
+        startState: function () { return { cur: header }; },
+        token: function (stream, state) { return state.cur(stream, state); }
+      };
+    });
+
+    // --- editors --------------------------------------------------------------
+    function editorTheme() {
+      return document.documentElement.classList.contains('dark') ? 'dracula' : 'default';
+    }
+    var tokenEditor = CodeMirror.fromTextArea(document.getElementById('token'), {
+      mode: 'jwt', theme: editorTheme(), lineWrapping: true, viewportMargin: Infinity
+    });
+    var headerEditor = CodeMirror.fromTextArea(document.getElementById('header'), {
+      mode: { name: 'javascript', json: true }, theme: editorTheme(), lineWrapping: true, readOnly: true, viewportMargin: Infinity
+    });
+    var payloadEditor = CodeMirror.fromTextArea(document.getElementById('payload'), {
+      mode: { name: 'javascript', json: true }, theme: editorTheme(), lineWrapping: true, viewportMargin: Infinity
+    });
+    function applyEditorTheme() {
+      var theme = editorTheme();
+      [tokenEditor, headerEditor, payloadEditor].forEach(function (ed) { ed.setOption('theme', theme); });
+    }
+
+    var suppress = false; // guards against programmatic-edit feedback loops
+
+    function alg() { return document.getElementById('algorithm-select').value; }
+
+    function b64urlDecode(str) {
+      var s = str.replace(/-/g, '+').replace(/_/g, '/');
+      var pad = s.length % 4; if (pad === 2) s += '=='; else if (pad === 3) s += '=';
+      var raw = atob(s);
+      try { return decodeURIComponent(escape(raw)); } catch (e) { return raw; }
+    }
+    function prettySegment(seg) {
+      try { return JSON.stringify(JSON.parse(b64urlDecode(seg)), null, 2); }
+      catch (e) { return null; }
+    }
+
+    function setError(id, on) {
+      document.getElementById(id).classList.toggle('panel-error', !!on);
+    }
+
+    function decodeIntoEditors() {
+      var value = tokenEditor.getValue().replace(/\s/g, '');
+      if (!value) return;
+      var parts = value.split('.');
+      suppress = true;
+      var h = prettySegment(parts[0] || '');
+      var p = prettySegment(parts[1] || '');
+      headerEditor.setValue(h === null ? '' : h);
+      payloadEditor.setValue(p === null ? '' : p);
+      setError('panel-header', h === null);
+      setError('panel-payload', p === null);
+      suppress = false;
+      annotateTimestamps(headerEditor);
+      annotateTimestamps(payloadEditor);
+      var payloadObj = null;
+      try { payloadObj = JSON.parse(b64urlDecode(parts[1] || '')); } catch (e) { payloadObj = null; }
+      renderClaims(payloadObj);
+    }
+
+    // --- claim-level validation -----------------------------------------------
+    var STATE_CLASS = {
+      ok:   'text-emerald-600 dark:text-emerald-300',
+      bad:  'text-red-600 dark:text-red-300',
+      warn: 'text-amber-600 dark:text-amber-300',
+      info: 'text-slate-500 dark:text-slate-400'
+    };
+    var STATE_MARK = { ok: '✓', bad: '✗', warn: '!', info: '•' };
+
+    function humanizeDelta(seconds) {
+      var s = Math.abs(seconds), unit = 'second', n = s;
+      if (s >= 86400) { n = s / 86400; unit = 'day'; }
+      else if (s >= 3600) { n = s / 3600; unit = 'hour'; }
+      else if (s >= 60) { n = s / 60; unit = 'minute'; }
+      n = Math.round(n);
+      return n + ' ' + unit + (n === 1 ? '' : 's');
+    }
+
+    function validityRow(state, label, detail) {
+      var row = document.createElement('div');
+      row.className = 'flex items-baseline gap-2 ' + STATE_CLASS[state];
+      var mark = document.createElement('span');
+      mark.className = 'font-bold';
+      mark.textContent = STATE_MARK[state];
+      var lab = document.createElement('span');
+      lab.className = 'font-semibold';
+      lab.textContent = label;
+      row.appendChild(mark);
+      row.appendChild(lab);
+      if (detail) {
+        var det = document.createElement('span');
+        det.className = 'text-slate-500 dark:text-slate-400';
+        det.textContent = detail;          // textContent: never interpolate token data as HTML
+        row.appendChild(det);
+      }
+      return row;
+    }
+
+    function claimItem(key, value) {
+      var wrap = document.createElement('div');
+      wrap.className = 'flex min-w-0 items-baseline gap-2';
+      var dt = document.createElement('dt');
+      dt.className = 'shrink-0 font-mono text-xs font-semibold text-slate-500 dark:text-slate-400';
+      dt.textContent = key;
+      var dd = document.createElement('dd');
+      dd.className = 'min-w-0 break-words font-mono text-xs text-slate-700 dark:text-slate-200';
+      dd.textContent = value;
+      wrap.appendChild(dt);
+      wrap.appendChild(dd);
+      return wrap;
+    }
+
+    function renderClaims(payload) {
+      var box = document.getElementById('claims');
+      var validity = document.getElementById('claims-validity');
+      var list = document.getElementById('claims-list');
+      validity.textContent = '';
+      list.textContent = '';
+      if (!payload || typeof payload !== 'object') { box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+
+      var now = Math.floor(Date.now() / 1000);
+
+      // Time-based validity (unambiguous, computed client-side)
+      if (typeof payload.exp === 'number') {
+        if (payload.exp < now) validity.appendChild(validityRow('bad', 'Expired', humanizeDelta(now - payload.exp) + ' ago'));
+        else validity.appendChild(validityRow('ok', 'Not expired', 'expires in ' + humanizeDelta(payload.exp - now)));
+      } else {
+        validity.appendChild(validityRow('info', 'No exp claim', 'token does not expire'));
+      }
+      if (typeof payload.nbf === 'number') {
+        if (payload.nbf > now) validity.appendChild(validityRow('warn', 'Not yet valid', 'starts in ' + humanizeDelta(payload.nbf - now)));
+        else validity.appendChild(validityRow('ok', 'Active', 'nbf has passed'));
+      }
+      if (typeof payload.iat === 'number' && payload.iat > now + 60) {
+        validity.appendChild(validityRow('warn', 'Issued in the future', humanizeDelta(payload.iat - now) + ' ahead'));
+      }
+
+      // Recognised SciToken / JWT claims, shown for quick inspection
+      var KEYS = ['iss', 'aud', 'sub', 'scope', 'ver', 'jti'];
+      KEYS.forEach(function (k) {
+        if (payload[k] === undefined || payload[k] === null) return;
+        var v = typeof payload[k] === 'string' ? payload[k] : JSON.stringify(payload[k]);
+        list.appendChild(claimItem(k, v));
+      });
+    }
+
+    // --- epoch-timestamp hover annotations ------------------------------------
+    var tsTooltip = document.createElement('div');
+    tsTooltip.id = 'ts-tooltip';
+    document.body.appendChild(tsTooltip);
+
+    function formatEpoch(seconds) {
+      var d = new Date(seconds * 1000);
+      if (isNaN(d.getTime())) return null;
+      return {
+        local: d.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'long' }),
+        utc: d.toISOString()
+      };
+    }
+
+    // Mark any unquoted 10-digit (≈2001–2286) integer/float as a hoverable epoch.
+    var NUM_RE = /\d+(?:\.\d+)?/g;
+    function annotateTimestamps(editor) {
+      editor.getAllMarks().forEach(function (m) { m.clear(); });
+      for (var line = 0; line < editor.lineCount(); line++) {
+        var text = editor.getLine(line);
+        NUM_RE.lastIndex = 0;
+        var m;
+        while ((m = NUM_RE.exec(text)) !== null) {
+          if (m[0].split('.')[0].length !== 10) continue;        // epoch-seconds length
+          if (text[m.index - 1] === '"' || text[m.index + m[0].length] === '"') continue; // skip quoted (string) values
+          var info = formatEpoch(parseFloat(m[0]));
+          if (!info) continue;
+          editor.markText(
+            { line: line, ch: m.index },
+            { line: line, ch: m.index + m[0].length },
+            { className: 'cm-ts', attributes: { 'data-ts-local': info.local, 'data-ts-utc': info.utc } }
+          );
+        }
+      }
+    }
+
+    function tsRow(label, value) {
+      var row = document.createElement('div');
+      var span = document.createElement('span');
+      span.className = 'ts-label';
+      span.textContent = label + ' ';
+      row.appendChild(span);
+      row.appendChild(document.createTextNode(value));
+      return row;
+    }
+
+    document.addEventListener('mousemove', function (e) {
+      var el = e.target.closest ? e.target.closest('.cm-ts') : null;
+      if (!el) {
+        if (tsTooltip.style.display === 'block') tsTooltip.style.display = 'none';
+        return;
+      }
+      tsTooltip.textContent = '';
+      tsTooltip.appendChild(tsRow('Local:', el.getAttribute('data-ts-local')));
+      tsTooltip.appendChild(tsRow('UTC:', el.getAttribute('data-ts-utc')));
+      tsTooltip.style.display = 'block';
+      var w = tsTooltip.offsetWidth, h = tsTooltip.offsetHeight;
+      var left = Math.min(e.clientX + 14, window.innerWidth - w - 8);
+      var top = (e.clientY + 20 + h > window.innerHeight) ? e.clientY - h - 14 : e.clientY + 20;
+      tsTooltip.style.left = left + 'px';
+      tsTooltip.style.top = top + 'px';
+    });
+
+    function updateCurl(token) {
+      document.getElementById('curl').textContent =
+        'curl -H "Authorization: Bearer ' + token + '" https://demo.scitokens.org/protected';
+    }
+
+    function setSignature(success, message) {
+      var el = document.getElementById('signature');
+      el.textContent = message;
+      el.className = 'mt-5 rounded-lg border px-4 py-3 text-sm font-semibold ' +
+        (success
+          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+          : 'border-red-500/40 bg-red-500/10 text-red-300');
+    }
+
+    async function verify() {
+      var value = tokenEditor.getValue().replace(/\s/g, '');
+      if (!value) return;
+      try {
+        var res = await fetch('/verify', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ token: value })
+        });
+        var data = await res.json();
+        setSignature(!!data.Success, data.Error || (data.Success ? 'Signature Verified' : 'Invalid signature'));
+        setError('panel-encoded', !data.Success);
+      } catch (e) {
+        setSignature(false, 'Verification request failed');
+      }
+    }
+
+    async function issue() {
+      var header, payload;
+      try {
+        header = JSON.parse(headerEditor.getValue() || '{}');
+        payload = JSON.parse(payloadEditor.getValue() || '{}');
+      } catch (e) {
+        setError('panel-payload', true); setError('panel-header', true);
+        setSignature(false, 'Invalid JSON in header or payload');
+        return;
+      }
+      setError('panel-payload', false); setError('panel-header', false);
+      try {
+        var res = await fetch('/issue', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ header: header, payload: payload, algorithm: alg() })
+        });
+        if (!res.ok) throw new Error('issue failed');
+        var token = await res.text();
+        suppress = true; tokenEditor.setValue(token); suppress = false;
+        decodeIntoEditors();
+        updateCurl(token);
+        verify();
+      } catch (e) {
+        setSignature(false, 'Unable to issue token');
+      }
+    }
+
+    // debounce so we don't re-sign on every keystroke
+    function debounce(fn, ms) {
+      var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); };
+    }
+    var debouncedIssue = debounce(issue, 600);
+
+    // --- wiring ---------------------------------------------------------------
+    payloadEditor.on('change', function () { if (!suppress) debouncedIssue(); });
+    tokenEditor.on('change', function () {
+      if (suppress) return;
+      decodeIntoEditors();
+      updateCurl(tokenEditor.getValue().replace(/\s/g, ''));
+      verify();
+    });
+    document.getElementById('algorithm-select').addEventListener('change', issue);
+    document.getElementById('protectedPayload').addEventListener('click', function () {
+      suppress = true;
+      payloadEditor.setValue(JSON.stringify(
+        { scope: 'read:/protected', aud: 'https://demo.scitokens.org' }, null, 2));
+      suppress = false;
+      issue();
+    });
+
+    // libraries filter
+    document.getElementById('lib-filter').addEventListener('change', function () {
+      var v = this.value;
+      document.querySelectorAll('#lib-grid > article').forEach(function (a) {
+        a.style.display = (v === '*' || a.dataset.lang === v) ? '' : 'none';
+      });
+    });
+
+    // --- dark / light theme toggle -------------------------------------------
+    var themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', function () {
+      var isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      applyEditorTheme();
+    });
+    // follow the OS setting until the user makes an explicit choice
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      if (localStorage.getItem('theme')) return;
+      document.documentElement.classList.toggle('dark', e.matches);
+      applyEditorTheme();
+    });
+
+    // --- copy-to-clipboard helper --------------------------------------------
+    function flashCopied(btn) {
+      var original = btn.dataset.label || btn.textContent;
+      btn.dataset.label = original;
+      btn.textContent = 'Copied!';
+      setTimeout(function () { btn.textContent = original; }, 1500);
+    }
+    function copyText(text, btn) {
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); flashCopied(btn); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flashCopied(btn); }, fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    // copy buttons on library install commands + the curl command (read sibling <pre>)
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        copyText(btn.parentElement.querySelector('pre').textContent, btn);
+      });
+    });
+
+    // copy buttons on the encoded / header / payload editors
+    var EDITORS = { token: tokenEditor, header: headerEditor, payload: payloadEditor };
+    document.querySelectorAll('.copy-editor').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var ed = EDITORS[btn.dataset.editor];
+        if (ed) copyText(ed.getValue(), btn);
+      });
+    });
+
+    // --- mobile nav menu ------------------------------------------------------
+    var navToggle = document.getElementById('nav-toggle');
+    var mobileMenu = document.getElementById('mobile-menu');
+    function setMenu(open) {
+      mobileMenu.classList.toggle('hidden', !open);
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.getElementById('nav-icon-open').classList.toggle('hidden', open);
+      document.getElementById('nav-icon-close').classList.toggle('hidden', !open);
+    }
+    navToggle.addEventListener('click', function () {
+      setMenu(mobileMenu.classList.contains('hidden'));
+    });
+    mobileMenu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () { setMenu(false); });
+    });
+
+    // --- initial load: fetch a default token from the backend -----------------
+    (async function () {
+      try {
+        var res = await fetch('/issue');
+        var token = await res.text();
+        suppress = true; tokenEditor.setValue(token); suppress = false;
+        decodeIntoEditors();
+        updateCurl(token);
+        verify();
+      } catch (e) {
+        tokenEditor.setValue('ERROR RETRIEVING DEFAULT TOKEN');
+        setSignature(false, 'Could not reach the token issuer');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "scitokens-demo",
+  "main": "src/entry.py",
+  "compatibility_date": "2025-11-02",
+  "compatibility_flags": ["python_workers", "python_dedicated_snapshot"],
+
+  // Static site (single index.html + device-code page) served by Workers
+  // Static Assets. Non-asset paths fall through to the Python Worker, which
+  // also explicitly forwards unmatched requests via the ASSETS binding.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  // Secrets (set with `npx wrangler secret put <NAME>`):
+  //   PRIVATE_KEY      base64-encoded RSA PEM private key (RS256)
+  //   EC_PRIVATE_KEY   base64-encoded EC  PEM private key (ES256)
+}

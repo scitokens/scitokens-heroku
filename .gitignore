@@ -104,3 +104,17 @@ node_modules
 .tmp
 .DS_Store
 npm-debug.log
+
+# --- SciTokens Cloudflare Worker ---
+# Key material and secrets must never be committed (use Worker secrets / .dev.vars)
+*.pem
+.env
+.dev.vars
+# Cloudflare / uv tooling
+.wrangler/
+.venv/
+uv.lock
+node_modules/
+# Python Workers build artifacts (pywrangler)
+.venv-workers/
+python_modules/

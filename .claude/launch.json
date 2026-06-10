@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "scitokens-dev",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["dev_server.py"],
+      "port": 8787
+    }
+  ]
+}

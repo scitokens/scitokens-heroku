@@ -1,35 +1,12 @@
 {
-  "name": "jwt.io",
-  "version": "0.0.1",
-  "dependencies": {
-    "bower": "^1.4.1",
-    "express": "^4.13.4",
-    "express-sslify": "^1.0.1",
-    "marked": "^4.0.10",
-    "serve": "*",
-    "grunt": "^1.5.3",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-concat": "^0.5.0",
-    "grunt-contrib-connect": "^3.0.0",
-    "grunt-contrib-copy": "^0.5.0",
-    "grunt-contrib-cssmin": "^4.0.0",
-    "grunt-contrib-htmlmin": "^3.1.0",
-    "grunt-contrib-jade": "^0.14.1",
-    "grunt-contrib-stylus": "^0.21.0",
-    "grunt-contrib-uglify": "^0.5.1",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-mocha-phantomjs": "4.0.0",
-    "grunt-usemin": "^3.1.1",
-    "matchdep": "~0.3.0"
+  "name": "scitokens-demo",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./styles/input.css -o ./public/app.css --minify",
+    "watch:css": "tailwindcss -i ./styles/input.css -o ./public/app.css --watch"
   },
   "devDependencies": {
-    "expect.js": "^0.3.1"
-  },
-  "scripts": {
-    "test": "grunt test --verbose",
-    "start": "node server.js",
-    "watch": "grunt",
-    "postinstall": "bower install && grunt build"
+    "tailwindcss": "^3.4",
+    "wrangler": "^4"
   }
 }

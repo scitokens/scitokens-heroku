@@ -1,0 +1,50 @@
+name: CI
+
+# Fast pre-merge checks: the Worker bundles and the committed CSS is current.
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Build Tailwind CSS
+        run: npm run build:css
+
+      # Catches the common footgun: editing Tailwind classes in index.html but
+      # forgetting to rebuild/commit public/app.css.
+      - name: Verify public/app.css is up to date
+        run: |
+          if ! git diff --quiet -- public/app.css; then
+            echo "::error file=public/app.css::public/app.css is stale. Run 'npm run build:css' and commit the result."
+            git --no-pager diff -- public/app.css
+            exit 1
+          fi
+
+      - name: Set up uv (Python tooling)
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      # Dry run: builds the Worker bundle and validates wrangler.jsonc without
+      # publishing. Needs no Cloudflare credentials.
+      - name: Validate Worker build (dry run)
+        run: uv run pywrangler deploy --dry-run

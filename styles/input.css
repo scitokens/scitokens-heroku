@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Theme-aware base + custom widgets (was inline <style> in index.html) ---- */
+:root { color-scheme: light; }
+html.dark { color-scheme: dark; }
+body { background: radial-gradient(1200px 600px at 80% -10%, #fbe4f0 0%, transparent 60%), #f8fafc; }
+html.dark body { background: radial-gradient(1200px 600px at 80% -10%, #2a1230 0%, transparent 60%), #0c0f17; }
+
+/* jwt.io-style colour-coded token segments */
+.cm-jwt-header    { color: #fb015b; }
+.cm-jwt-payload   { color: #b21fe0; }
+.cm-jwt-signature { color: #0284c7; }
+.cm-jwt-dot       { color: #475569; }
+html.dark .cm-jwt-payload   { color: #d63aff; }
+html.dark .cm-jwt-signature { color: #00b9f1; }
+html.dark .cm-jwt-dot       { color: #e2e8f0; }
+
+.CodeMirror {
+  font-size: 13px; line-height: 1.5;
+  font-family: "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  background: #ffffff; border-radius: 0.5rem; padding: 0.25rem;
+}
+html.dark .CodeMirror { background: #0f1320; }
+
+/* Each editor grows to fit its content. The id-scoped selector is needed to beat
+   CodeMirror's own `.CodeMirror { height: 300px }` default (loaded after app.css). */
+#panel-encoded .CodeMirror,
+#panel-header .CodeMirror,
+#panel-payload .CodeMirror { height: auto; }
+
+/* On lg+, the encoded panel is a flex column; let its editor fill the row height
+   so it spans both the (content-sized) header and payload rows on the right. */
+@media (min-width: 1024px) {
+  #panel-encoded .CodeMirror { height: 100%; }
+}
+.panel-error .CodeMirror { box-shadow: 0 0 0 1px #ef4444 inset; }
+
+/* epoch-timestamp claims become hoverable */
+.cm-ts { text-decoration: underline dotted rgba(100,116,139,.8); text-underline-offset: 3px; cursor: help; }
+html.dark .cm-ts { text-decoration-color: rgba(148,163,184,.8); }
+
+#ts-tooltip {
+  position: fixed; z-index: 50; pointer-events: none; display: none;
+  background: #ffffff; color: #1e293b; border: 1px solid rgba(0,0,0,.12);
+  border-radius: 8px; padding: 7px 10px; max-width: 340px;
+  font-size: 12px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+}
+html.dark #ts-tooltip {
+  background: #1b2030; color: #e2e8f0; border-color: rgba(255,255,255,.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+#ts-tooltip .ts-label { color: #64748b; }
+html.dark #ts-tooltip .ts-label { color: #94a3b8; }

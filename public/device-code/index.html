@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SciTokens Demo — Device Code</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style> body { background: radial-gradient(1200px 600px at 80% -10%, #2a1230 0%, transparent 60%), #0c0f17; } </style>
+</head>
+<body class="min-h-screen text-slate-200 antialiased">
+  <header class="border-b border-white/10 bg-[#0c0f17]/80">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+      <a href="/" class="flex items-center gap-2 text-lg font-bold tracking-tight">
+        <span class="inline-block h-3 w-3 rounded-full bg-[#fb015b]"></span> SciTokens
+      </a>
+      <a href="/" class="text-sm text-slate-300 hover:text-white">← Back to debugger</a>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-md px-5 py-16">
+    <div class="rounded-2xl border border-white/10 bg-[#11151f] p-6 shadow-2xl">
+      <h1 class="text-xl font-bold text-white">Enter your device code</h1>
+      <p class="mt-2 text-sm text-slate-400">
+        Enter the code shown by your device to authorize the demo OAuth2 device-code flow.
+      </p>
+      <form action="/submit-code" method="post" class="mt-5 space-y-4">
+        <input type="text" name="code" placeholder="Code"
+               class="w-full rounded-md border border-white/10 bg-[#0f1320] px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-[#fb015b] focus:outline-none" />
+        <button type="submit"
+                class="w-full rounded-md bg-[#fb015b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d80f56]">
+          Submit
+        </button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
