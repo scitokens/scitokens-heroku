@@ -4,6 +4,3 @@
 #   EC_PRIVATE_KEY=$(base64 -i ec_private.pem)
 PRIVATE_KEY="base64-encoded-RSA-PEM-here"
 EC_PRIVATE_KEY="base64-encoded-EC-PEM-here"
-
-# Only needed for the /secret (Badgr badge) endpoint:
-BADGR_REFRESH="badgr-refresh-token-here"

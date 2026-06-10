@@ -14,7 +14,7 @@ This is a **static frontend + a single Cloudflare Python Worker**:
   `styles/input.css` (`npm run build:css`) — no runtime CDN.
 - **Backend** (`src/`): a Python Worker that signs/verifies tokens with the Python
   [`scitokens`](https://github.com/scitokens/scitokens) library and implements the
-  OAuth2 device-code flow, `/protected`, and `/secret` (Badgr badge).
+  OAuth2 device-code flow, `/protected`, and `/secret`.
 
 ## Architecture
 
@@ -29,9 +29,8 @@ tailwind.config.js       Tailwind config (class dark mode, scans public/**/*.htm
 src/
   entry.py               async on_fetch router (the Worker entry point)
   tokens.py              issue / verify / enforce / JWKS  (scitokens)
-  badgr.py               Badgr badge issuance for /secret  (async fetch + KV)
 pyproject.toml           Python deps (scitokens, PyJWT, cryptography)
-wrangler.jsonc           Worker config (assets, KV, secrets)
+wrangler.jsonc           Worker config (assets, secrets)
 dev_server.py            local-only dev server (no Cloudflare toolchain needed)
 ```
 
@@ -48,7 +47,7 @@ dev_server.py            local-only dev server (no Cloudflare toolchain needed)
 | POST | `/submit-code` | Device-code submission (no-op → redirect) |
 | POST | `/oauth2/token` | Issue access + refresh tokens (always issues) |
 | GET | `/protected` | Resource requiring `read:/protected` |
-| GET | `/secret` | Issues a Badgr badge to the token's `sub` |
+| GET | `/secret` | Resource requiring `read:/secret` — confirms a successful query |
 
 ## Configuration
 
@@ -57,14 +56,6 @@ Keys are supplied as **Worker secrets** (base64-encoded PEM, same as the old app
 ```sh
 base64 -i private.pem    | npx wrangler secret put PRIVATE_KEY
 base64 -i ec_private.pem | npx wrangler secret put EC_PRIVATE_KEY
-npx wrangler secret put BADGR_REFRESH      # only for /secret
-```
-
-Create the KV namespace used to cache the Badgr access token and paste its id into
-`wrangler.jsonc`:
-
-```sh
-npx wrangler kv namespace create BADGR_CACHE
 ```
 
 ## Develop & deploy (Cloudflare)
@@ -110,10 +101,8 @@ Two workflows live in `.github/workflows/`:
    `deploy.yml` uses a `production` GitHub Environment — either create that environment
    (and put the secrets there, where you can also require reviewers) or remove the
    `environment: production` line.
-2. **Replace `REPLACE_WITH_KV_NAMESPACE_ID`** in `wrangler.jsonc` with the id printed by
-   `npx wrangler kv namespace create BADGR_CACHE` — a real deploy fails with a placeholder id.
-3. **Set the Worker secrets once** (they persist in Cloudflare, so the Action doesn't carry
-   them): `PRIVATE_KEY`, `EC_PRIVATE_KEY`, and `BADGR_REFRESH` via `npx wrangler secret put …`
+2. **Set the Worker secrets once** (they persist in Cloudflare, so the Action doesn't carry
+   them): `PRIVATE_KEY` and `EC_PRIVATE_KEY` via `npx wrangler secret put …`
    (see [Configuration](#configuration)).
 
 ## Local frontend dev (no Cloudflare toolchain)

@@ -2,7 +2,8 @@
 
 Replaces the original Flask ``app.py``.  Serves the JSON API (token issuing,
 verification, JWKS, the OAuth2 device-code flow, ``/protected`` and ``/secret``)
-while the static site is served alongside via Workers Static Assets.
+while the static site is served alongside via Workers Static Assets.  The
+``/secret`` endpoint simply confirms a successful authenticated query.
 """
 
 import base64
@@ -16,7 +17,6 @@ from js import Response, Object
 from pyodide.ffi import to_js
 
 import tokens
-import badgr
 
 ISSUER = "https://demo.scitokens.org"
 # The device-code flow is a stateless demo: it always issues a token, so the
@@ -78,7 +78,7 @@ class Default(WorkerEntrypoint):
             if path == "/protected":
                 return self._protected(request)
             if path == "/secret":
-                return await self._secret(request)
+                return self._secret(request)
         except Exception as exc:  # surface errors as 500 instead of opaque crashes
             return _response("Internal error: %s" % exc, status=500)
 
@@ -251,7 +251,7 @@ class Default(WorkerEntrypoint):
             return _response("Validation incorrect: %s" % failure, status=403)
         return _response("Succesfully accessed the protected resource!")
 
-    async def _secret(self, request):
+    def _secret(self, request):
         serialized, err = self._bearer(request)
         if err:
             return err
@@ -264,4 +264,4 @@ class Default(WorkerEntrypoint):
             )
         if token is None:
             return _response("Validation incorrect: %s" % failure, status=403)
-        return _response(await badgr.issue_badge(token, self.env))
+        return _response("Successfully queried the demo token issuer!")
