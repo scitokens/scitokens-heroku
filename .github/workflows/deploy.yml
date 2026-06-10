@@ -40,10 +40,15 @@ jobs:
       - name: Build Tailwind CSS
         run: npm run build:css
 
+      # Do NOT set `python-version` here: it exports UV_PYTHON, which overrides
+      # the VIRTUAL_ENV that pywrangler points at the emscripten Pyodide venv.
+      # With UV_PYTHON set, `uv pip install` resolves against the native host
+      # Python instead, installs nothing into the Pyodide site-packages, and
+      # `python_modules` ships empty — cryptography then fails to import at
+      # deploy time. pywrangler provisions its own interpreters via uv.
       - name: Set up uv (Python tooling)
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.12"
           enable-cache: true
 
       - name: Deploy with pywrangler
