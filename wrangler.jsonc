@@ -16,4 +16,20 @@
   // Secrets (set with `npx wrangler secret put <NAME>`):
   //   PRIVATE_KEY      base64-encoded RSA PEM private key (RS256)
   //   EC_PRIVATE_KEY   base64-encoded EC  PEM private key (ES256)
+
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  }
 }
