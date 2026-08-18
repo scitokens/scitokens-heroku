@@ -38,6 +38,20 @@ jobs:
             exit 1
           fi
 
+      # /oauth2/certs and /.well-known/openid-configuration are static assets so
+      # they never boot the Python Worker. Regenerate them from the public keys
+      # and fail if the committed copies drifted.
+      - name: Generate static discovery endpoints
+        run: npm run build:endpoints
+
+      - name: Verify static discovery endpoints are up to date
+        run: |
+          if ! git diff --quiet -- public/oauth2/certs public/.well-known/openid-configuration; then
+            echo "::error::Static discovery endpoints are stale. Run 'npm run build:endpoints' and commit the result."
+            git --no-pager diff -- public/oauth2/certs public/.well-known/openid-configuration
+            exit 1
+          fi
+
       # Do NOT set `python-version` here: it exports UV_PYTHON, which overrides
       # the VIRTUAL_ENV that pywrangler points at the emscripten Pyodide venv.
       # With UV_PYTHON set, `uv pip install` resolves against the native host

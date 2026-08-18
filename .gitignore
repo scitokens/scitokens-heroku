@@ -108,6 +108,10 @@ npm-debug.log
 # --- SciTokens Cloudflare Worker ---
 # Key material and secrets must never be committed (use Worker secrets / .dev.vars)
 *.pem
+# ...except the public halves, which are published at /oauth2/certs anyway and
+# are what scripts/gen-endpoints.mjs builds the static JWKS from in CI.
+!public.pem
+!ec_public.pem
 .env
 .dev.vars
 # Cloudflare / uv tooling

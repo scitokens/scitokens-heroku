@@ -1,9 +1,15 @@
 """Cloudflare Python Worker for the SciTokens demo.
 
 Replaces the original Flask ``app.py``.  Serves the JSON API (token issuing,
-verification, JWKS, the OAuth2 device-code flow, ``/protected`` and ``/secret``)
-while the static site is served alongside via Workers Static Assets.  The
-``/secret`` endpoint simply confirms a successful authenticated query.
+verification, the OAuth2 device-code flow, ``/protected`` and ``/secret``) while
+the static site is served alongside via Workers Static Assets.  The ``/secret``
+endpoint simply confirms a successful authenticated query.
+
+``/oauth2/certs`` and ``/.well-known/openid-configuration`` are *not* handled
+here: their responses are constant, so they are pre-generated into ``public/``
+by ``scripts/gen-endpoints.mjs`` and served as static assets.  Static assets are
+matched before the Worker runs, so those two paths no longer pay a Pyodide cold
+start (they were by far the most frequent requests).
 """
 
 import base64
@@ -63,10 +69,6 @@ class Default(WorkerEntrypoint):
                 return await self._issue(request)
             if path == "/verify" and method == "POST":
                 return await self._verify(request)
-            if path == "/oauth2/certs":
-                return self._certs()
-            if path == "/.well-known/openid-configuration":
-                return self._openid_configuration()
             if path == "/oauth2/oidc-cm" and method == "POST":
                 return await self._client_register(request)
             if path == "/oauth2/device_authorization" and method == "POST":
@@ -118,34 +120,7 @@ class Default(WorkerEntrypoint):
         except Exception as exc:
             return _json({"Success": False, "Error": str(exc)})
 
-    def _certs(self):
-        rsa_pem, ec_pem = self._keys()
-        return _json(tokens.jwks(rsa_pem, ec_pem))
-
-    # --- OAuth2 discovery / device-code flow ---------------------------------
-
-    def _openid_configuration(self):
-        return _json(
-            {
-                "issuer": ISSUER,
-                "jwks_uri": ISSUER + "/oauth2/certs",
-                "device_authorization_endpoint": ISSUER + "/oauth2/device_authorization",
-                "registration_endpoint": ISSUER + "/oauth2/oidc-cm",
-                "token_endpoint": ISSUER + "/oauth2/token",
-                "response_types_supported": ["code", "id_token"],
-                "response_modes_supported": ["query", "fragment", "form_post"],
-                "grant_types_supported": [
-                    "authorization_code",
-                    "refresh_token",
-                    "urn:ietf:params:oauth:grant-type:token-exchange",
-                    "urn:ietf:params:oauth:grant-type:device_code",
-                ],
-                "subject_types_supported": ["public"],
-                "id_token_signing_alg_values_supported": ["RS256", "RS384", "RS512"],
-                "scopes_supported": ["read:/", "write:/"],
-                "claims_supported": ["aud", "exp", "iat", "iss", "sub"],
-            }
-        )
+    # --- OAuth2 client registration / device-code flow -----------------------
 
     async def _client_register(self, request):
         try:

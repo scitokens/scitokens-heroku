@@ -40,6 +40,12 @@ jobs:
       - name: Build Tailwind CSS
         run: npm run build:css
 
+      # Regenerates public/oauth2/certs and
+      # public/.well-known/openid-configuration so they ship as static assets
+      # rather than being served by the Worker on every request.
+      - name: Generate static discovery endpoints
+        run: npm run build:endpoints
+
       # Do NOT set `python-version` here: it exports UV_PYTHON, which overrides
       # the VIRTUAL_ENV that pywrangler points at the emscripten Pyodide venv.
       # With UV_PYTHON set, `uv pip install` resolves against the native host

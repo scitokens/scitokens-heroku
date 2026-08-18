@@ -23,7 +23,12 @@ public/                  static site (served by Workers Static Assets)
   index.html             single-page debugger UI
   app.css                compiled Tailwind (built from styles/input.css)
   device-code/index.html device-code submission page
+  oauth2/certs           JWKS            (generated — see scripts/gen-endpoints.mjs)
+  .well-known/openid-configuration
+                         OIDC discovery  (generated — see scripts/gen-endpoints.mjs)
+  _headers               asset header rules (JSON content type for the two above)
   img/                   favicon + library icons
+scripts/gen-endpoints.mjs  builds the two static discovery documents
 styles/input.css         Tailwind source (@tailwind directives + custom CSS)
 tailwind.config.js       Tailwind config (class dark mode, scans public/**/*.html)
 src/
@@ -40,14 +45,33 @@ dev_server.py            local-only dev server (no Cloudflare toolchain needed)
 | --- | --- | --- |
 | GET/POST | `/issue` | Sign a SciToken (`{payload, algorithm}`) |
 | POST | `/verify` | Verify a token → `{Success, Error}` |
-| GET | `/oauth2/certs` | JWKS (RS256 + ES256 public keys) |
-| GET | `/.well-known/openid-configuration` | OIDC discovery |
+| GET | `/oauth2/certs` | JWKS (RS256 + ES256 public keys) — **static asset** |
+| GET | `/.well-known/openid-configuration` | OIDC discovery — **static asset** |
 | POST | `/oauth2/oidc-cm` | Client registration |
 | POST | `/oauth2/device_authorization` | Device-code start (stateless) |
 | POST | `/submit-code` | Device-code submission (no-op → redirect) |
 | POST | `/oauth2/token` | Issue access + refresh tokens (always issues) |
 | GET | `/protected` | Resource requiring `read:/protected` |
 | GET | `/secret` | Resource requiring `read:/secret` — confirms a successful query |
+
+### Static discovery endpoints
+
+`/oauth2/certs` and `/.well-known/openid-configuration` return the same bytes on
+every request, so they are pre-generated into `public/` by
+`scripts/gen-endpoints.mjs` (`npm run build:endpoints`) and committed, exactly like
+`public/app.css`. Workers Static Assets are matched **before** the Worker runs, so
+these two paths no longer start a Pyodide interpreter — they were the bulk of the
+Worker's invocations.
+
+The JWKS is derived from the committed `public.pem` / `ec_public.pem`, i.e. the
+public halves of the `PRIVATE_KEY` / `EC_PRIVATE_KEY` Worker secrets. **If you ever
+rotate those secrets, update the two public PEMs and rerun `npm run build:endpoints`**,
+otherwise the published JWKS will no longer match the signing keys. CI regenerates
+both documents on every PR and fails if the committed copies are stale.
+
+Because the files are extensionless, `public/_headers` sets their
+`Content-Type: application/json` (the asset server would otherwise guess
+`application/octet-stream`) plus a one-hour `Cache-Control`.
 
 ## Configuration
 
@@ -72,6 +96,8 @@ Uses the uv-first Python Workers workflow.
 uv tool install workers-py
 npm install                      # installs wrangler + tailwindcss (dev dependencies)
 npm run build:css                # compile public/app.css (rerun after editing markup/styles)
+npm run build:endpoints          # regenerate the static discovery documents
+npm run build                    # both of the above
 cp .dev.vars.example .dev.vars   # fill in base64 keys
 uv run pywrangler dev            # local: http://localhost:8787
 uv run pywrangler deploy
@@ -86,11 +112,13 @@ uv run pywrangler deploy
 
 Two workflows live in `.github/workflows/`:
 
-- **`ci.yml`** (on every PR + push to `master`): `npm ci`, builds the CSS, fails if
-  `public/app.css` is stale, then runs `pywrangler deploy --dry-run` to confirm the Worker
-  bundles. Needs no Cloudflare credentials.
+- **`ci.yml`** (on every PR + push to `master`): `npm ci`, builds the CSS and the static
+  discovery endpoints, fails if `public/app.css` or either generated document is stale,
+  then runs `pywrangler deploy --dry-run` to confirm the Worker bundles. Needs no
+  Cloudflare credentials.
 - **`deploy.yml`** (on push to `master` + manual `workflow_dispatch`): builds the CSS and
-  runs `uv run pywrangler deploy`. Merging a PR to `master` ships it.
+  the static discovery endpoints, then runs `uv run pywrangler deploy`. Merging a PR to
+  `master` ships it.
 
 **One-time setup before the first deploy works:**
 

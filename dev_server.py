@@ -31,6 +31,10 @@ CONTENT_TYPES = {
     ".css": "text/css", ".js": "application/javascript", ".json": "application/json",
 }
 
+# Pre-generated, extensionless discovery documents (see scripts/gen-endpoints.mjs).
+# In production public/_headers gives these the same content type.
+STATIC_JSON_PATHS = {"/.well-known/openid-configuration", "/oauth2/certs"}
+
 
 class Handler(BaseHTTPRequestHandler):
     def _send(self, body, status=200, content_type="text/plain", headers=None):
@@ -66,8 +70,11 @@ class Handler(BaseHTTPRequestHandler):
             self._send("Not Found", 404)
             return
         ext = os.path.splitext(full)[1]
+        content_type = CONTENT_TYPES.get(ext, "application/octet-stream")
+        if path in STATIC_JSON_PATHS:
+            content_type = "application/json"
         with open(full, "rb") as fh:
-            self._send(fh.read(), 200, CONTENT_TYPES.get(ext, "application/octet-stream"))
+            self._send(fh.read(), 200, content_type)
 
     def do_GET(self):
         path = urlparse(self.path).path

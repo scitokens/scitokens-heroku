@@ -1,0 +1,11 @@
+# Workers Static Assets header rules.
+#
+# /oauth2/certs and /.well-known/openid-configuration are extensionless, so the
+# asset server would otherwise guess application/octet-stream for them.
+/oauth2/certs
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+
+/.well-known/openid-configuration
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600

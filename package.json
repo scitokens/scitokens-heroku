@@ -2,7 +2,9 @@
   "name": "scitokens-demo",
   "private": true,
   "scripts": {
+    "build": "npm run build:css && npm run build:endpoints",
     "build:css": "tailwindcss -i ./styles/input.css -o ./public/app.css --minify",
+    "build:endpoints": "node scripts/gen-endpoints.mjs",
     "watch:css": "tailwindcss -i ./styles/input.css -o ./public/app.css --watch"
   },
   "devDependencies": {
