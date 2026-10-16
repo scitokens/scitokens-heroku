@@ -8,7 +8,7 @@
     "watch:css": "tailwindcss -i ./styles/input.css -o ./public/app.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4",
+    "tailwindcss": "^4.3",
     "wrangler": "^4"
   }
 }
